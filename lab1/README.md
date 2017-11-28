@@ -94,8 +94,7 @@ Pushed 5/6 layers, 91% complete
 Pushed 6/6 layers, 100% complete
 Push successful
 ```
-
-When The build pod completes  an application pod is deployed with the result image 
+An application pod is deployed with the result image 
 ```
 $ oc get pods
 NAME                  READY     STATUS      RESTARTS   AGE
@@ -137,18 +136,13 @@ Openshift defines a DNS convention to access services hosted on the cluster
 <service>.<pod_namespace>.svc.cluster.local
 ```
 So to acces the mongo instance in our namespace we should use one of the following  hostname: 
-* ```
- personnedb.msa-dev.svc.cluster.local
-```
-* ```
-personnedb.svc.cluster.local
-```
-*  ```
-personnedb
+ ```
+ personnedb.msa-dev.svc.cluster.local, personnedb.svc.cluster.local, personnedb
 ```
 
 
 1. ConfigMap
+
 To pass the custom application.properties file, we can rely on a configMap and a volume to put the file in one SpringBoot expected location.
 
 ```
@@ -163,9 +157,10 @@ oc create cm props-volume-cm —from-file=./configMap/dev/
 ```
 
 2. Volumes
-
-
-
+```
+oc volume --add=true  --mount-path=/deployments/config --configmap-name=props-volume-cm --name=props-vol dc/personneapi
+deploymentconfig "personneapi" updated
+```
 
 
 3. Routes
