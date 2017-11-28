@@ -15,8 +15,18 @@ This application will expose three main endpoints to server the following functi
 *  ```GET /Personne/ ```        Retreive all items from Personne Collection
 *  ```POST /Personne/ ```       Insert new user document in MongoDB 
 
-
+---
 ### Application Setup
+To setup the microservice application, we will use a msa-dev project 
+login to you openshift cluster and create the DEV namespace msa-dev
+```
+oc login -u developer https://192.168.99.100:8443
+```
+The default developer password is developper on a Minishift cluster.
+
+```
+oc new-project msa-dev
+```
 
 #### S2i Builds
 
@@ -24,6 +34,11 @@ This application will expose three main endpoints to server the following functi
 
 
 #### Application Configuration
+
+1. ConfigMap
+2. Volumes
+3. Routes
+
 
 #### Application Tests
 
