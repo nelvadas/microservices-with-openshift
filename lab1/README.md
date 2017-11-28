@@ -17,12 +17,15 @@ This application will expose three main endpoints to server the following functi
 
 ---
 ### Application Setup
-To setup the microservice application, we will use a msa-dev project 
-login to you openshift cluster and create the DEV namespace msa-dev
+To setup the microservice application, we first need to be connected to a cluster 
+login to you openshift cluster ( our cluster IP is 192.168.99.100)
 ```
 oc login -u developer https://192.168.99.100:8443
 ```
 The default developer password is developper on a Minishift cluster.
+
+Create a namespace to hold the project, In  [Lab3] (../lab3) we will see how to promote projects from one environement(dev) to another ( uat or prod)
+In this lab we are working only on the dev environment
 
 ```
 oc new-project msa-dev
