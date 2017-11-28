@@ -30,6 +30,16 @@ oc new-project msa-dev
 ```
 
 #### S2i Builds
+Running the Database
+
+Openshift provides a default S2i builder image to run Java JAR  applications: redhat-openjdk18-openshift
+```oc get is -n openshift | grep jdk
+redhat-openjdk18-openshift            registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift               latest,1.2,1.2-6 + 2 mo
+```
+
+Create the personneapi application with the following command
+
+
 
 #### Readiness and Liveness Probes
 
