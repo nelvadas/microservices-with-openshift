@@ -1,31 +1,35 @@
-## Microservices with Openshift 
+## LAB 1:  Building and Running a SpringBoot/MongoDB Microservice Application on Openshift using S2i. 
 
-The purpose of this lab series is to demonstrate how to start a microservice journey with Openshift using the following technologies
-* Openshift 3.6+
-* SpringBoot
-* MongoDB
-* Jenkins2
-* Ansible 
 
-### Pre-requisites
+### Introduction
+The purpose of this lab is to build a microservice on Openshift using the S2i process
+To keep it simple, the  msa-personne application model has only one Entity persisted in a MongoDB document 
 
- It is assumed that you have an OpenShift cluster instance running and available. This instance can take several forms dependin    g on your environment and needs :
- * Full blown OpenShift cluster at your site, see how to [Install OpenShift at your site](https://docs.openshift.com/container-platform/3    .5/install_config/index.html),
-  * Red Hat Container Development Kit on your laptop, see how to [Get Started with CDK](http://developers.redhat.com/products/cdk/get-star    ted/),
-  * Lightweight Minishift on your laptop, see [Minishift project page](https://github.com/minishift/minishift).
- 
- You should also have the `oc` client line interface tool installed on your machine. Pick the corresponding OpenShift version from [this     page](https://github.com/openshift/origin/releases).
- 
-The following labs are completed and tested on an Openshift 3.6
+``` 
+  Personne(ref, firstName, lastName, birthDate..)
+  e.g  {"ref":"001","firstName":"Foo","lastName":"Bar","birthDate":} 
+```
 
-### Agenda
+This application will expose three main endpoints to server the following functionnalities
+*  ```GET /personne/{ref} ```   To retreive a user details based on a reference
+*  ```GET /personne/ ```        Retreive all users
+*  ```POST /personne/ ```       Insert new user document in MongoDB database
+
+
+### Application Setup
+
+#### S2i Builds
+
+#### Application Configuration
+
+#### Application Tests
+
+
+
+### Next Steps
 
 The lab series is organized around the folowing items
 
-* [LAB1](./lab1/): Building and Running  a SpringBoot/MongoDB Microservice Application on Openshift using Source 2 Image processes.
-* [LAB2](./lab2/): Creating Reusable Application Templates
-* [LAB3](./lab3/): Continuous Integration and Delivery with Jenkins Pipelines
-* [LAB4](./lab4/): Circuit Breaker Pattern 
-* [LAB5](./lab5/): Envent Streaming  with  Apache Kafka
-* [LAB6](./lab6/): Securing and Testing your Microservices
+* [LAB2](../lab2/): Creating Reusable Application Templates
+* [LAB6](../lab3/): CI/CD with Jenkins2  Pipenlines
 
