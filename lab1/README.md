@@ -2,7 +2,7 @@
 
 
 ### Introduction
-The purpose of this lab is to build a microservice on Openshift using the S2i process
+The purpose of this lab is to build a microservice on Openshift using the S2i process.
 To keep it simple, the  msa-personne application model has only one Entity persisted in a MongoDB document 
 
 ``` 
@@ -11,9 +11,9 @@ To keep it simple, the  msa-personne application model has only one Entity persi
 ```
 
 This application will expose three main endpoints to server the following functionnalities
-*  ```GET /personne/{ref} ```   To retreive a user details based on a reference
-*  ```GET /personne/ ```        Retreive all items from Personne Collection
-*  ```POST /personne/ ```       Insert new user document in MongoDB 
+*  ```GET /Personne/{ref} ```   To retreive a user details based on a reference
+*  ```GET /Personne/ ```        Retreive all items from Personne Collection
+*  ```POST /Personne/ ```       Insert new user document in MongoDB 
 
 
 ### Application Setup
