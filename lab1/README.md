@@ -30,8 +30,32 @@ oc new-project msa-dev
 ```
 
 #### S2i Builds
-Running the Database
 
+##### Start a Mongo Database Pod
+
+```oc new-app --docker-image=mongo:latest --name=personnedb
+--> Found Docker image d22888a (3 weeks old) from Docker Hub for "mongo:latest"
+
+    * An image stream will be created as "personnedb:latest" that will track this image
+    * This image will be deployed in deployment config "personnedb"
+    * Port 27017/tcp will be load balanced by service "personnedb"
+      * Other containers can access this service through the hostname "personnedb"
+    * This image declares volumes and will default to use non-persistent, host-local storage.
+      You can add persistent volumes later by running 'volume dc/personnedb --add ...'
+    * WARNING: Image "mongo:latest" runs as the 'root' user which may not be permitted by your cluster administrator
+
+--> Creating resources ...
+    imagestream "personnedb" created
+    deploymentconfig "personnedb" created
+    service "personnedb" created
+--> Success
+    Run 'oc status' to view your app.
+```
+An ephemeral MongoDB service presonnedb is created and started  in the namespace msa-dev namespace.
+
+
+
+##### Create the personneapi Microservice
 Openshift provides a default S2i builder image to run Java JAR  applications: redhat-openjdk18-openshift
 ```oc get is -n openshift | grep jdk
 redhat-openjdk18-openshift            registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift               latest,1.2,1.2-6 + 2 mo
