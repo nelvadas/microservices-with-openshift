@@ -12,13 +12,16 @@ To keep it simple, the  msa-personne application model has only one Entity persi
 
 This application will expose three main endpoints to server the following functionnalities
 *  ```GET /personne/{ref} ```   To retreive a user details based on a reference
-*  ```GET /personne/ ```        Retreive all users
-*  ```POST /personne/ ```       Insert new user document in MongoDB database
+*  ```GET /personne/ ```        Retreive all items from Personne Collection
+*  ```POST /personne/ ```       Insert new user document in MongoDB 
 
 
 ### Application Setup
 
 #### S2i Builds
+
+#### Readiness and Liveness Probes
+
 
 #### Application Configuration
 
@@ -30,6 +33,6 @@ This application will expose three main endpoints to server the following functi
 
 The lab series is organized around the folowing items
 
-* [LAB2](../lab2/): Creating Reusable Application Templates
-* [LAB6](../lab3/): CI/CD with Jenkins2  Pipenlines
+* [Lab 2](../lab2/): Creating Reusable Application Templates
+* [Lab 3](../lab3/): CI/CD with Jenkins2  Pipenlines
 
