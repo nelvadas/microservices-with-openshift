@@ -135,7 +135,7 @@ Openshift defines a DNS convention to access services hosted on the cluster
 ```
 <service>.<pod_namespace>.svc.cluster.local
 ```
-So to acces the mongo instance in our namespace we should use one of the following  hostname: 
+So to acces the mongo instance in our namespace we can  use one of the following value as MongoDB IP/hostname: 
  ```
  personnedb.msa-dev.svc.cluster.local, personnedb.svc.cluster.local, personnedb
 ```
@@ -147,30 +147,66 @@ To pass the custom application.properties file, we can rely on a configMap and a
 
 ```
 cd microservices-with-openshift/lab1/msa-personne
+oc create cm props-volume-cm --from-file=./configMap/dev/
+oc describe cm props-volume-cm
 
-cat configMap/dev/application.properties
-   spring.data.mongodb.host=personnedb.msa-dev.svc.cluster.local
-   spring.data.mongodb.port=27017
+Name:		props-volume-cm
+Namespace:	msa-dev
+Labels:		<none>
+Annotations:	<none>
 
-oc create cm props-volume-cm —from-file=./configMap/dev/
+Data
+====
+application.properties:
+----
+# Service DNS nommenclature
+# <service>.<pod_namespace>.svc.cluster.local
+spring.data.mongodb.host=personnedb.msa-dev.svc.cluster.local
+spring.data.mongodb.port=27017
 
 ```
 
 2. Volumes
+
+ by default, Spring Boot will load application properties file from $JAR_FILE_LOCATION/config
+ In this case the jar are deployed in /deployments folder, as consequences, application.properties file can be loaded from 
+ /deployments/config without any other configuration.
+
+To pass the custom application.propertie file from configMap to the application Pod filesystem, 
+we need to create and mount volume with type=ConfigMap on /deployments/config with the configMap as content 
+  
+
 ```
 oc volume --add=true  --mount-path=/deployments/config --configmap-name=props-volume-cm --name=props-vol dc/personneapi
-deploymentconfig "personneapi" updated
 ```
+After running this command the deployment config is updated and the configuration change event occurs.
+The application pod is redeployed with zero downtime ( Rolling Strategy) and the new version is bring live.
 
+In application logs you can see the connection is open 
+
+```
+oc logs personneapi-4-30jbd
+2017-11-28 01:00:57.969  INFO 1 --- [ter.local:27017] org.mongodb.driver.connection            : Opened connection [connectionId{localValue:1, serverValue:1}] to personnedb.msa-dev.svc.cluster.local:27017
+2017-11-28 01:00:57.979  INFO 1 --- [ter.local:27017] org.mongodb.driver.cluster               : Monitor thread successfully connected to server with description ServerDescription{address=personnedb.msa-dev.svc.cluster.local:27017, type=STANDALONE, state=CONNECTED, ok=true, version=ServerVersion{versionList=[3, 4, 10]}, minWireVersion=0, maxWireVersion=5, maxDocumentSize=16777216, roundTripTimeNanos=6752981}
+2017-11-28 01:00:57.981  INFO 1 --- [ter.local:27017] org.mongodb.driver.cluster               : Discovered cluster type of STANDALONE
+```
 
 3. Routes
 
 
-#### Readiness and Liveness Probes
+
+
+NB.
+On some Minishift instances you need to update your resolv.conf to resolve the nip.io url
+```
+sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
+```
+
 
 #### Application Tests
 
 
+#### Readiness and Liveness Probes
 
 ### Next Steps
 
