@@ -1,7 +1,21 @@
-## LAB 1:  Building and Running a SpringBoot/MongoDB Microservice Application on Openshift using S2i. 
+# LAB 1:  Building and Running a SpringBoot/MongoDB Microservice Application on Openshift using S2i. 
+
+# Table of contents
+1. [Introduction](#introduction)
+2. [Application Setup](#appSetup)
+    1. [S2I Builds](#s2i)
+        1. [Database](#database)
+        2. [Personne API](#personneApi)
+    2. [Application Configuraiton](#config)
+       1. [configMap](#configMap)
+       2. [Properties Voumes ](#volumes)
+       2. [DNS and Routing ](#routes)
+3. [Running and Testing the Application](#testing)
+4. [Becomes a kubernetes friend: probes](#probes)
+5. [Next Labs](#next)
 
 
-### Introduction
+### Introduction <a name="introduction"></a>
 The purpose of this lab is to build a microservice on Openshift using the S2i process.
 To keep it simple, the  msa-personne application model has only one Entity persisted in a MongoDB document 
 
@@ -16,7 +30,7 @@ This application will expose three main endpoints to server the following functi
 *  ```POST /Personne/ ```       Insert new user document in MongoDB 
 
 ---
-### Application Setup
+### Application Setup <a name="appSetup"></a>
 To setup the **personneapi** microservice application, we first need to be connected to a cluster 
 login to you openshift cluster ( *our cluster IP is 192.168.99.100 and we are using the default developer account*)
 ```
@@ -29,9 +43,9 @@ In this lab, we will be working only in the dev environment, so create a namespa
 oc new-project msa-dev
 ```
 
-#### S2i Builds
+#### S2i Builds <a name="s2i"></a>
 
-##### Start a Mongo Database Pod
+##### Start a Mongo Database Pod <a name="database"></a>
 The *personneapi* microservice relies on a MongDB to persist its data.
 
 ``` 
@@ -41,7 +55,7 @@ As result, an *ephemeral* MongoDB service presonnedb is created and started  in 
 
 
 
-##### Create the personneapi Microservice
+##### Create the personneapi Microservice <a name="personneApi"></a>
 Openshift provides a default S2i builder image to run JAR  applications: redhat-openjdk18-openshift
 
 ```
@@ -129,7 +143,7 @@ Caused by: java.net.ConnectException: Connection refused (Connection refused)
 In the next section we will update the application configuration and provide a correct configuration file with database parameters.
 
 
-#### Application Configuration
+#### Application Configuration <a name="config"></a>
 In this section, we will provide a custom application.properties file to the application with custom details of our MongoDB instance.
 Openshift defines a DNS convention to access services hosted on the cluster
 ```
@@ -141,7 +155,7 @@ So to acces the mongo instance in our namespace we can  use one of the following
 ```
 
 
-1. ConfigMap
+1. ConfigMap <a name="configMap"></a>
 
 To pass the custom application.properties file, we can rely on a configMap and a volume to put the file in one SpringBoot expected location.
 
@@ -166,7 +180,7 @@ spring.data.mongodb.port=27017
 
 ```
 
-2. Volumes
+2. Volumes <a name="volume"></a>
 
  by default, Spring Boot will load application properties file from $JAR_FILE_LOCATION/config
  In this case the jar are deployed in /deployments folder, as consequences, application.properties file can be loaded from 
@@ -191,7 +205,7 @@ oc logs personneapi-4-30jbd
 2017-11-28 01:00:57.981  INFO 1 --- [ter.local:27017] org.mongodb.driver.cluster               : Discovered cluster type of STANDALONE
 ```
 
-3. Routes
+3. Routes <a name="routes"></a>
 
 To be able to acces the personneapi microservices outside Openshift Cluster, we need a route to expose the associated service 
 
@@ -212,7 +226,7 @@ sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
 ```
 
 
-#### Application Tests
+### Application Tests  <a name="testing"></a>
 
 The application is responding on personneapi route, by using a curl command we will perform the basic operations exposed by the microservice.
 
@@ -237,11 +251,26 @@ Result
 [{"ref":"001","firstName":"Foo","lastName":"Baar","birthDate":576255419301,"customTag":"PoC"},{"ref":"002","firstName":"Test","lastName":"Tatampion","birthDate":null,"customTag":null}]
 ```
 
-#### Readiness and Liveness Probes
+### Readiness and Liveness Probes <a name="probes"></a>
+In order for k8s to determine if your application is ready to serve clients, you should define a readiness Probe 
+* DB
+The mongodb pod is ready when a client can open a tcp connection on port 27017
 
-### Next Steps
+```
+oc set probe dc/personnedb --readiness --open-tcp='27017'
+```
+* Personne API
 
-The lab series is organized around the folowing items
+Periodically k8s checks if your pod are still running ( Liveness probe)
+
+```
+oc set probe dc/personneapi  --readiness  --initial-delay-seconds=5  --get-url=http://:8080/healthz
+oc set probe dc/personneapi  --liveness  --initial-delay-seconds=0  --get-url=http://:8080/healthz
+```
+give 5 sec to the application to start before sending the firt readiness check.
+
+
+### Next Steps <a name="introduction"></a>
 
 * [Lab 2](../lab2/): Creating Reusable Application Templates
 * [Lab 3](../lab3/): CI/CD with Jenkins2  Pipenlines
