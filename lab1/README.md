@@ -32,7 +32,7 @@ This application will expose three main endpoints to server the following functi
 ---
 ### Application Setup <a name="appSetup"></a>
 
-[Pod Screen shot] (lab1-pods.png)
+[Pod Screen shot] (https://github.com/nelvadas/microservices-with-openshift/blob/master/lab1/lab1-pods.png)
 
 To setup the **personneapi** microservice application, we first need to be connected to a cluster 
 login to you openshift cluster ( *our cluster IP is 192.168.99.100 and we are using the default developer account*)
