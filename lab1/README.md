@@ -264,10 +264,19 @@ oc set probe dc/personnedb --readiness --open-tcp='27017'
 Periodically k8s checks if your pod are still running ( Liveness probe)
 
 ```
-oc set probe dc/personneapi  --readiness  --initial-delay-seconds=5  --get-url=http://:8080/healthz
-oc set probe dc/personneapi  --liveness  --initial-delay-seconds=0  --get-url=http://:8080/healthz
+oc set probe dc/personneapi  --readiness  --initial-delay-seconds=5  --get-url=http://:8080/health
+oc set probe dc/personneapi  --liveness  --initial-delay-seconds=0  --get-url=http://:8080/health
 ```
 give 5 sec to the application to start before sending the firt readiness check.
+
+The /health URI is automatically configured in the spring boot application by adding the acurator in application pom.xml
+
+```
+     <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+```
 
 
 ### Next Steps <a name="introduction"></a>
