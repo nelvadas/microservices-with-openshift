@@ -193,11 +193,20 @@ oc logs personneapi-4-30jbd
 
 3. Routes
 
+To be able to acces the personneapi microservices outside Openshift Cluster, we need a route to expose the associated service 
 
-
+```
+oc expose --path=/ svc/personneapi
+```
+This creates a route on which the application can be called outside Openshift Cluster
+```
+oc get routes
+NAME          HOST/PORT                                   PATH      SERVICES      PORT       TERMINATION
+personneapi   personneapi-msa-dev.192.168.99.100.nip.io   /         personneapi   8080-tcp
+```
 
 NB.
-On some Minishift instances you need to update your resolv.conf to resolve the nip.io url
+On some Minishift instances you need to update your resolv.conf to resolve the nip.io urls
 ```
 sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
 ```
@@ -205,6 +214,28 @@ sudo echo nameserver 8.8.8.8 > /etc/resolv.conf
 
 #### Application Tests
 
+The application is responding on personneapi route, by using a curl command we will perform the basic operations exposed by the microservice.
+
+* Insert a new Foo/Bar Person
+```
+curl -X POST -H 'Content-Type: Application/json' -d '{ "ref" : "001", "firstName" : "Foo", "lastName" : "Baar", "birthDate": "1988-04-05T14:56:59.301Z", "customTag":"PoC" }' http://personneapi-msa-dev.192.168.99.100.nip.io/Personne/
+
+{"ref":"001","firstName":"Foo","lastName":"Baar","birthDate":576255419301,"customTag":"PoC"}
+```
+
+
+* Find the inserted user
+```
+curl -H 'Content-Type: Application/json' http://personneapi-msa-dev.192.168.99.100.nip.io/Personne/001
+
+Result: {"ref":"001","firstName":"Foo","lastName":"Baar","birthDate":576255419301,"customTag":"PoC"}
+```
+* Retrieve the collection of existing users
+```
+curl -H 'Content-Type: Application/json' http://personneapi-msa-dev.192.168.99.100.nip.io/Personne/
+Result
+[{"ref":"001","firstName":"Foo","lastName":"Baar","birthDate":576255419301,"customTag":"PoC"},{"ref":"002","firstName":"Test","lastName":"Tatampion","birthDate":null,"customTag":null}]
+```
 
 #### Readiness and Liveness Probes
 

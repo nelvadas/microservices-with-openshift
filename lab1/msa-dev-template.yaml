@@ -1,0 +1,1221 @@
+apiVersion: v1
+kind: Template
+metadata:
+  creationTimestamp: null
+  name: msa-dev-template
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: personneapi
+    name: personneapi
+  spec:
+    failedBuildsHistoryLimit: 5
+    nodeSelector: null
+    output:
+      to:
+        kind: ImageStreamTag
+        name: personneapi:latest
+    postCommit: {}
+    resources: {}
+    runPolicy: Serial
+    source:
+      contextDir: lab1/msa-personne
+      git:
+        uri: https://github.com/nelvadas/microservices-with-openshift.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: ImageStreamTag
+          name: redhat-openjdk18-openshift:1.2-6
+          namespace: openshift
+      type: Source
+    successfulBuildsHistoryLimit: 5
+    triggers:
+    - github:
+        secret: 91RyJQAHmWTPSZDQhtRS
+      type: GitHub
+    - generic:
+        secret: Wcw27diGjzCVqh8FmOq5
+      type: Generic
+    - type: ConfigChange
+    - imageChange: {}
+      type: ImageChange
+  status:
+    lastVersion: 0
+- apiVersion: v1
+  kind: Build
+  metadata:
+    annotations:
+      openshift.io/build-config.name: personneapi
+      openshift.io/build.number: "1"
+      openshift.io/build.pod-name: personneapi-1-build
+    creationTimestamp: null
+    labels:
+      app: personneapi
+      buildconfig: personneapi
+      openshift.io/build-config.name: personneapi
+      openshift.io/build.start-policy: Serial
+    name: personneapi-1
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: BuildConfig
+      name: personneapi
+      uid: f9e64292-d3c7-11e7-8333-080027b750d6
+  spec:
+    nodeSelector: null
+    output:
+      pushSecret:
+        name: builder-dockercfg-0f8kb
+      to:
+        kind: ImageStreamTag
+        name: personneapi:latest
+    postCommit: {}
+    resources: {}
+    revision:
+      git:
+        author:
+          email: jbossdevguide@gmail.com
+          name: jbossdevguidebook
+        commit: 0094b224537f21729a1e2741af137adbc5e9de98
+        committer:
+          email: jbossdevguide@gmail.com
+          name: jbossdevguidebook
+        message: MongoDB Pod Creation
+      type: Git
+    serviceAccount: builder
+    source:
+      contextDir: lab1/msa-personne
+      git:
+        uri: https://github.com/nelvadas/microservices-with-openshift.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift@sha256:e980728cea6c4deaf664d20f4568b9f5834a50a3326c9d905ed3b0b77b07c6bf
+      type: Source
+    triggeredBy:
+    - message: Build configuration change
+  status:
+    config:
+      name: personneapi
+    output:
+      to:
+        imageDigest: sha256:0950965a8b5c8ce89b6a7eacad134e13c5d7dee99e64c3e451c84e86fabb4679
+    outputDockerImageReference: 172.30.1.1:5000/msa-dev/personneapi:latest
+    phase: New
+    stages:
+    - durationMilliseconds: 3244
+      name: FetchInputs
+      startTime: 2017-11-27T23:09:13Z
+      steps:
+      - durationMilliseconds: 3244
+        name: FetchGitSource
+        startTime: 2017-11-27T23:09:13Z
+    - durationMilliseconds: 2299
+      name: CommitContainer
+      startTime: 2017-11-27T23:19:45Z
+      steps:
+      - durationMilliseconds: 2299
+        name: CommitContainer
+        startTime: 2017-11-27T23:19:45Z
+    - durationMilliseconds: 631349
+      name: Assemble
+      startTime: 2017-11-27T23:09:16Z
+      steps:
+      - durationMilliseconds: 631349
+        name: AssembleBuildScripts
+        startTime: 2017-11-27T23:09:16Z
+    - name: PostCommit
+      startTime: 2017-11-27T23:19:48Z
+      steps:
+      - name: RunPostCommitHook
+        startTime: 2017-11-27T23:19:48Z
+    - durationMilliseconds: 21010
+      name: PushImage
+      startTime: 2017-11-27T23:19:48Z
+      steps:
+      - durationMilliseconds: 21010
+        name: PushImage
+        startTime: 2017-11-27T23:19:48Z
+- apiVersion: v1
+  kind: Build
+  metadata:
+    annotations:
+      openshift.io/build-config.name: personneapi
+      openshift.io/build.number: "2"
+      openshift.io/build.pod-name: personneapi-2-build
+    creationTimestamp: null
+    labels:
+      app: personneapi
+      buildconfig: personneapi
+      openshift.io/build-config.name: personneapi
+      openshift.io/build.start-policy: Serial
+    name: personneapi-2
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: BuildConfig
+      name: personneapi
+      uid: f9e64292-d3c7-11e7-8333-080027b750d6
+  spec:
+    nodeSelector: null
+    output:
+      pushSecret:
+        name: builder-dockercfg-0f8kb
+      to:
+        kind: ImageStreamTag
+        name: personneapi:latest
+    postCommit: {}
+    resources: {}
+    revision:
+      git:
+        author:
+          email: jbossdevguide@gmail.com
+          name: jbossdevguidebook
+        commit: 9de76fac43b9859efc54e4b1e778d28a194a5b7b
+        committer:
+          email: jbossdevguide@gmail.com
+          name: jbossdevguidebook
+        message: Test properties
+      type: Git
+    serviceAccount: builder
+    source:
+      contextDir: lab1/msa-personne
+      git:
+        uri: https://github.com/nelvadas/microservices-with-openshift.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift@sha256:e980728cea6c4deaf664d20f4568b9f5834a50a3326c9d905ed3b0b77b07c6bf
+      type: Source
+    triggeredBy:
+    - message: Manually triggered
+  status:
+    config:
+      name: personneapi
+    output:
+      to:
+        imageDigest: sha256:3a5f3514be490f2682efad6dbbd3193ccff6f4d3b1c08fb2c5681fc47ee312c0
+    outputDockerImageReference: 172.30.1.1:5000/msa-dev/personneapi:latest
+    phase: New
+    stages:
+    - durationMilliseconds: 4291
+      name: FetchInputs
+      startTime: 2017-11-28T00:03:49Z
+      steps:
+      - durationMilliseconds: 4291
+        name: FetchGitSource
+        startTime: 2017-11-28T00:03:49Z
+    - durationMilliseconds: 2226
+      name: CommitContainer
+      startTime: 2017-11-28T00:15:29Z
+      steps:
+      - durationMilliseconds: 2226
+        name: CommitContainer
+        startTime: 2017-11-28T00:15:29Z
+    - durationMilliseconds: 698099
+      name: Assemble
+      startTime: 2017-11-28T00:03:54Z
+      steps:
+      - durationMilliseconds: 698099
+        name: AssembleBuildScripts
+        startTime: 2017-11-28T00:03:54Z
+    - name: PostCommit
+      startTime: 2017-11-28T00:15:32Z
+      steps:
+      - name: RunPostCommitHook
+        startTime: 2017-11-28T00:15:32Z
+    - durationMilliseconds: 4121
+      name: PushImage
+      startTime: 2017-11-28T00:15:32Z
+      steps:
+      - durationMilliseconds: 4121
+        name: PushImage
+        startTime: 2017-11-28T00:15:32Z
+- apiVersion: v1
+  kind: Build
+  metadata:
+    annotations:
+      openshift.io/build-config.name: personneapi
+      openshift.io/build.number: "3"
+      openshift.io/build.pod-name: personneapi-3-build
+    creationTimestamp: null
+    labels:
+      app: personneapi
+      buildconfig: personneapi
+      openshift.io/build-config.name: personneapi
+      openshift.io/build.start-policy: Serial
+    name: personneapi-3
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: BuildConfig
+      name: personneapi
+      uid: f9e64292-d3c7-11e7-8333-080027b750d6
+  spec:
+    nodeSelector: null
+    output:
+      pushSecret:
+        name: builder-dockercfg-0f8kb
+      to:
+        kind: ImageStreamTag
+        name: personneapi:latest
+    postCommit: {}
+    resources: {}
+    revision:
+      git:
+        author:
+          email: jbossdevguide@gmail.com
+          name: jbossdevguidebook
+        commit: 3f0cba06fa7fc28fd7b768b18d160da42adba0df
+        committer:
+          email: jbossdevguide@gmail.com
+          name: jbossdevguidebook
+        message: application properties template
+      type: Git
+    serviceAccount: builder
+    source:
+      contextDir: lab1/msa-personne
+      git:
+        uri: https://github.com/nelvadas/microservices-with-openshift.git
+      type: Git
+    strategy:
+      sourceStrategy:
+        from:
+          kind: DockerImage
+          name: registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift@sha256:e980728cea6c4deaf664d20f4568b9f5834a50a3326c9d905ed3b0b77b07c6bf
+      type: Source
+    triggeredBy:
+    - message: Manually triggered
+  status:
+    config:
+      name: personneapi
+    output:
+      to:
+        imageDigest: sha256:fce7e62a4fbb0ba79942bae870468843edaa4ef5577e0eb849e00ead9585c4c3
+    outputDockerImageReference: 172.30.1.1:5000/msa-dev/personneapi:latest
+    phase: New
+    stages:
+    - durationMilliseconds: 11648
+      name: FetchInputs
+      startTime: 2017-11-28T00:24:24Z
+      steps:
+      - durationMilliseconds: 11648
+        name: FetchGitSource
+        startTime: 2017-11-28T00:24:24Z
+    - durationMilliseconds: 2176
+      name: CommitContainer
+      startTime: 2017-11-28T00:49:50Z
+      steps:
+      - durationMilliseconds: 2176
+        name: CommitContainer
+        startTime: 2017-11-28T00:49:50Z
+    - durationMilliseconds: 1516773
+      name: Assemble
+      startTime: 2017-11-28T00:24:36Z
+      steps:
+      - durationMilliseconds: 1516773
+        name: AssembleBuildScripts
+        startTime: 2017-11-28T00:24:36Z
+    - name: PostCommit
+      startTime: 2017-11-28T00:49:53Z
+      steps:
+      - name: RunPostCommitHook
+        startTime: 2017-11-28T00:49:53Z
+    - durationMilliseconds: 4178
+      name: PushImage
+      startTime: 2017-11-28T00:49:53Z
+      steps:
+      - durationMilliseconds: 4178
+        name: PushImage
+        startTime: 2017-11-28T00:49:53Z
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personneapi
+    name: personneapi
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations: null
+      from:
+        kind: DockerImage
+        name: 172.30.1.1:5000/msa-dev/personneapi:latest
+      generation: null
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: ""
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: ImageStream
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/image.dockerRepositoryCheck: 2017-11-27T19:45:45Z
+    creationTimestamp: null
+    generation: 2
+    labels:
+      app: personnedb
+    name: personnedb
+  spec:
+    lookupPolicy:
+      local: false
+    tags:
+    - annotations:
+        openshift.io/imported-from: mongo:latest
+      from:
+        kind: DockerImage
+        name: 172.30.1.1:5000/msa-dev/personnedb:latest
+      generation: 2
+      importPolicy: {}
+      name: latest
+      referencePolicy:
+        type: Source
+  status:
+    dockerImageRepository: ""
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personneapi
+    name: personneapi
+  spec:
+    replicas: 1
+    selector:
+      app: personneapi
+      deploymentconfig: personneapi
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: personneapi
+          deploymentconfig: personneapi
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/msa-dev/personneapi@sha256:fce7e62a4fbb0ba79942bae870468843edaa4ef5577e0eb849e00ead9585c4c3
+          imagePullPolicy: Always
+          name: personneapi
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /deployments/config
+            name: props-vol
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: props-volume-cm
+          name: props-vol
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - personneapi
+        from:
+          kind: ImageStreamTag
+          name: personneapi:latest
+          namespace: msa-dev
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: DeploymentConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personnedb
+    name: personnedb
+  spec:
+    replicas: 1
+    selector:
+      app: personnedb
+      deploymentconfig: personnedb
+    strategy:
+      activeDeadlineSeconds: 21600
+      resources: {}
+      rollingParams:
+        intervalSeconds: 1
+        maxSurge: 25%
+        maxUnavailable: 25%
+        timeoutSeconds: 600
+        updatePeriodSeconds: 1
+      type: Rolling
+    template:
+      metadata:
+        annotations:
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: personnedb
+          deploymentconfig: personnedb
+      spec:
+        containers:
+        - image: mongo@sha256:51bdcc462e479c9da4968a67535cd161bc8dd3850cae760efb56e18fb4caae3e
+          imagePullPolicy: Always
+          name: personnedb
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: personnedb-volume-1
+          - mountPath: /data/db
+            name: personnedb-volume-2
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: personnedb-volume-1
+        - emptyDir: {}
+          name: personnedb-volume-2
+    test: false
+    triggers:
+    - type: ConfigChange
+    - imageChangeParams:
+        automatic: true
+        containerNames:
+        - personnedb
+        from:
+          kind: ImageStreamTag
+          name: personnedb:latest
+          namespace: msa-dev
+      type: ImageChange
+  status:
+    availableReplicas: 0
+    latestVersion: 0
+    observedGeneration: 0
+    replicas: 0
+    unavailableReplicas: 0
+    updatedReplicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/original-replicas: "1"
+      openshift.io/deployer-pod.name: personneapi-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: personneapi
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/deployment.status-reason: image change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"personneapi","namespace":"msa-dev","selfLink":"/apis/apps.openshift.io/v1/namespaces/msa-dev/deploymentconfigs/personneapi","uid":"f9e821b3-d3c7-11e7-8333-080027b750d6","resourceVersion":"18326","generation":3,"creationTimestamp":"2017-11-27T23:09:10Z","labels":{"app":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["personneapi"],"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personneapi:latest"},"lastTriggeredImage":"172.30.1.1:5000/msa-dev/personneapi@sha256:0950965a8b5c8ce89b6a7eacad134e13c5d7dee99e64c3e451c84e86fabb4679"}}],"replicas":1,"test":false,"selector":{"app":"personneapi","deploymentconfig":"personneapi"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"personneapi","deploymentconfig":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"containers":[{"name":"personneapi","image":"172.30.1.1:5000/msa-dev/personneapi@sha256:0950965a8b5c8ce89b6a7eacad134e13c5d7dee99e64c3e451c84e86fabb4679","ports":[{"containerPort":8080,"protocol":"TCP"},{"containerPort":8443,"protocol":"TCP"},{"containerPort":8778,"protocol":"TCP"}],"resources":{},"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":2,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"image change","causes":[{"type":"ImageChange","imageTrigger":{"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personneapi:latest"}}}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2017-11-27T23:09:10Z","lastTransitionTime":"2017-11-27T23:09:10Z","message":"Deployment config does not have minimum availability."}]}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personneapi
+      openshift.io/deployment-config.name: personneapi
+    name: personneapi-1
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: personneapi
+      uid: f9e821b3-d3c7-11e7-8333-080027b750d6
+  spec:
+    replicas: 0
+    selector:
+      app: personneapi
+      deployment: personneapi-1
+      deploymentconfig: personneapi
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: personneapi
+          openshift.io/deployment.name: personneapi-1
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: personneapi
+          deployment: personneapi-1
+          deploymentconfig: personneapi
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/msa-dev/personneapi@sha256:0950965a8b5c8ce89b6a7eacad134e13c5d7dee99e64c3e451c84e86fabb4679
+          imagePullPolicy: Always
+          name: personneapi
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/original-replicas: "1"
+      openshift.io/deployer-pod.name: personneapi-2-deploy
+      openshift.io/deployment-config.latest-version: "2"
+      openshift.io/deployment-config.name: personneapi
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: ""
+      openshift.io/deployment.status-reason: config change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"personneapi","namespace":"msa-dev","selfLink":"/apis/apps.openshift.io/v1/namespaces/msa-dev/deploymentconfigs/personneapi","uid":"f9e821b3-d3c7-11e7-8333-080027b750d6","resourceVersion":"18785","generation":5,"creationTimestamp":"2017-11-27T23:09:10Z","labels":{"app":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["personneapi"],"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personneapi:latest"},"lastTriggeredImage":"172.30.1.1:5000/msa-dev/personneapi@sha256:0950965a8b5c8ce89b6a7eacad134e13c5d7dee99e64c3e451c84e86fabb4679"}}],"replicas":1,"test":false,"selector":{"app":"personneapi","deploymentconfig":"personneapi"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"personneapi","deploymentconfig":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"props-vol","configMap":{"name":"props-volume-cm","defaultMode":420}}],"containers":[{"name":"personneapi","image":"172.30.1.1:5000/msa-dev/personneapi@sha256:0950965a8b5c8ce89b6a7eacad134e13c5d7dee99e64c3e451c84e86fabb4679","ports":[{"containerPort":8080,"protocol":"TCP"},{"containerPort":8443,"protocol":"TCP"},{"containerPort":8778,"protocol":"TCP"}],"resources":{},"volumeMounts":[{"name":"props-vol","mountPath":"/deployments/config"}],"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":2,"observedGeneration":4,"replicas":1,"updatedReplicas":1,"availableReplicas":1,"unavailableReplicas":0,"details":{"message":"config change","causes":[{"type":"ConfigChange"}]},"conditions":[{"type":"Available","status":"True","lastUpdateTime":"2017-11-27T23:20:12Z","lastTransitionTime":"2017-11-27T23:20:12Z","message":"Deployment config has minimum availability."},{"type":"Progressing","status":"True","lastUpdateTime":"2017-11-27T23:20:13Z","lastTransitionTime":"2017-11-27T23:20:13Z","reason":"NewReplicationControllerAvailable","message":"replication controller \"personneapi-1\" successfully rolled out"}],"readyReplicas":1}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personneapi
+      openshift.io/deployment-config.name: personneapi
+    name: personneapi-2
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: personneapi
+      uid: f9e821b3-d3c7-11e7-8333-080027b750d6
+  spec:
+    replicas: 0
+    selector:
+      app: personneapi
+      deployment: personneapi-2
+      deploymentconfig: personneapi
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "2"
+          openshift.io/deployment-config.name: personneapi
+          openshift.io/deployment.name: personneapi-2
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: personneapi
+          deployment: personneapi-2
+          deploymentconfig: personneapi
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/msa-dev/personneapi@sha256:0950965a8b5c8ce89b6a7eacad134e13c5d7dee99e64c3e451c84e86fabb4679
+          imagePullPolicy: Always
+          name: personneapi
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /deployments/config
+            name: props-vol
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: props-volume-cm
+          name: props-vol
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      kubectl.kubernetes.io/original-replicas: "1"
+      openshift.io/deployer-pod.name: personneapi-3-deploy
+      openshift.io/deployment-config.latest-version: "3"
+      openshift.io/deployment-config.name: personneapi
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: ""
+      openshift.io/deployment.status-reason: image change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"personneapi","namespace":"msa-dev","selfLink":"/apis/apps.openshift.io/v1/namespaces/msa-dev/deploymentconfigs/personneapi","uid":"f9e821b3-d3c7-11e7-8333-080027b750d6","resourceVersion":"19121","generation":7,"creationTimestamp":"2017-11-27T23:09:10Z","labels":{"app":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["personneapi"],"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personneapi:latest"},"lastTriggeredImage":"172.30.1.1:5000/msa-dev/personneapi@sha256:3a5f3514be490f2682efad6dbbd3193ccff6f4d3b1c08fb2c5681fc47ee312c0"}}],"replicas":1,"test":false,"selector":{"app":"personneapi","deploymentconfig":"personneapi"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"personneapi","deploymentconfig":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"props-vol","configMap":{"name":"props-volume-cm","defaultMode":420}}],"containers":[{"name":"personneapi","image":"172.30.1.1:5000/msa-dev/personneapi@sha256:3a5f3514be490f2682efad6dbbd3193ccff6f4d3b1c08fb2c5681fc47ee312c0","ports":[{"containerPort":8080,"protocol":"TCP"},{"containerPort":8443,"protocol":"TCP"},{"containerPort":8778,"protocol":"TCP"}],"resources":{},"volumeMounts":[{"name":"props-vol","mountPath":"/deployments/config"}],"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":3,"observedGeneration":6,"replicas":1,"updatedReplicas":1,"availableReplicas":1,"unavailableReplicas":0,"details":{"message":"image change","causes":[{"type":"ImageChange","imageTrigger":{"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personneapi:latest"}}}]},"conditions":[{"type":"Available","status":"True","lastUpdateTime":"2017-11-27T23:20:12Z","lastTransitionTime":"2017-11-27T23:20:12Z","message":"Deployment config has minimum availability."},{"type":"Progressing","status":"True","lastUpdateTime":"2017-11-27T23:54:09Z","lastTransitionTime":"2017-11-27T23:54:06Z","reason":"NewReplicationControllerAvailable","message":"replication controller \"personneapi-2\" successfully rolled out"}],"readyReplicas":1}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personneapi
+      openshift.io/deployment-config.name: personneapi
+    name: personneapi-3
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: personneapi
+      uid: f9e821b3-d3c7-11e7-8333-080027b750d6
+  spec:
+    replicas: 0
+    selector:
+      app: personneapi
+      deployment: personneapi-3
+      deploymentconfig: personneapi
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "3"
+          openshift.io/deployment-config.name: personneapi
+          openshift.io/deployment.name: personneapi-3
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: personneapi
+          deployment: personneapi-3
+          deploymentconfig: personneapi
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/msa-dev/personneapi@sha256:3a5f3514be490f2682efad6dbbd3193ccff6f4d3b1c08fb2c5681fc47ee312c0
+          imagePullPolicy: Always
+          name: personneapi
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /deployments/config
+            name: props-vol
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: props-volume-cm
+          name: props-vol
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.name: personneapi-4-deploy
+      openshift.io/deployment-config.latest-version: "4"
+      openshift.io/deployment-config.name: personneapi
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: ""
+      openshift.io/deployment.status-reason: image change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"personneapi","namespace":"msa-dev","selfLink":"/apis/apps.openshift.io/v1/namespaces/msa-dev/deploymentconfigs/personneapi","uid":"f9e821b3-d3c7-11e7-8333-080027b750d6","resourceVersion":"19619","generation":9,"creationTimestamp":"2017-11-27T23:09:10Z","labels":{"app":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["personneapi"],"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personneapi:latest"},"lastTriggeredImage":"172.30.1.1:5000/msa-dev/personneapi@sha256:fce7e62a4fbb0ba79942bae870468843edaa4ef5577e0eb849e00ead9585c4c3"}}],"replicas":1,"test":false,"selector":{"app":"personneapi","deploymentconfig":"personneapi"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"personneapi","deploymentconfig":"personneapi"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"props-vol","configMap":{"name":"props-volume-cm","defaultMode":420}}],"containers":[{"name":"personneapi","image":"172.30.1.1:5000/msa-dev/personneapi@sha256:fce7e62a4fbb0ba79942bae870468843edaa4ef5577e0eb849e00ead9585c4c3","ports":[{"containerPort":8080,"protocol":"TCP"},{"containerPort":8443,"protocol":"TCP"},{"containerPort":8778,"protocol":"TCP"}],"resources":{},"volumeMounts":[{"name":"props-vol","mountPath":"/deployments/config"}],"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":4,"observedGeneration":8,"replicas":1,"updatedReplicas":1,"availableReplicas":1,"unavailableReplicas":0,"details":{"message":"image change","causes":[{"type":"ImageChange","imageTrigger":{"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personneapi:latest"}}}]},"conditions":[{"type":"Available","status":"True","lastUpdateTime":"2017-11-27T23:20:12Z","lastTransitionTime":"2017-11-27T23:20:12Z","message":"Deployment config has minimum availability."},{"type":"Progressing","status":"True","lastUpdateTime":"2017-11-28T00:15:43Z","lastTransitionTime":"2017-11-28T00:15:42Z","reason":"NewReplicationControllerAvailable","message":"replication controller \"personneapi-3\" successfully rolled out"}],"readyReplicas":1}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personneapi
+      openshift.io/deployment-config.name: personneapi
+    name: personneapi-4
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: personneapi
+      uid: f9e821b3-d3c7-11e7-8333-080027b750d6
+  spec:
+    replicas: 1
+    selector:
+      app: personneapi
+      deployment: personneapi-4
+      deploymentconfig: personneapi
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "4"
+          openshift.io/deployment-config.name: personneapi
+          openshift.io/deployment.name: personneapi-4
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: personneapi
+          deployment: personneapi-4
+          deploymentconfig: personneapi
+      spec:
+        containers:
+        - image: 172.30.1.1:5000/msa-dev/personneapi@sha256:fce7e62a4fbb0ba79942bae870468843edaa4ef5577e0eb849e00ead9585c4c3
+          imagePullPolicy: Always
+          name: personneapi
+          ports:
+          - containerPort: 8080
+            protocol: TCP
+          - containerPort: 8443
+            protocol: TCP
+          - containerPort: 8778
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /deployments/config
+            name: props-vol
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - configMap:
+            defaultMode: 420
+            name: props-volume-cm
+          name: props-vol
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: ReplicationController
+  metadata:
+    annotations:
+      openshift.io/deployer-pod.name: personnedb-1-deploy
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: personnedb
+      openshift.io/deployment.phase: Complete
+      openshift.io/deployment.replicas: "1"
+      openshift.io/deployment.status-reason: image change
+      openshift.io/encoded-deployment-config: |
+        {"kind":"DeploymentConfig","apiVersion":"v1","metadata":{"name":"personnedb","namespace":"msa-dev","selfLink":"/apis/apps.openshift.io/v1/namespaces/msa-dev/deploymentconfigs/personnedb","uid":"8e613f13-d3ab-11e7-8333-080027b750d6","resourceVersion":"15633","generation":3,"creationTimestamp":"2017-11-27T19:45:43Z","labels":{"app":"personnedb"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"strategy":{"type":"Rolling","rollingParams":{"updatePeriodSeconds":1,"intervalSeconds":1,"timeoutSeconds":600,"maxUnavailable":"25%","maxSurge":"25%"},"resources":{},"activeDeadlineSeconds":21600},"triggers":[{"type":"ConfigChange"},{"type":"ImageChange","imageChangeParams":{"automatic":true,"containerNames":["personnedb"],"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personnedb:latest"},"lastTriggeredImage":"mongo@sha256:51bdcc462e479c9da4968a67535cd161bc8dd3850cae760efb56e18fb4caae3e"}}],"replicas":1,"test":false,"selector":{"app":"personnedb","deploymentconfig":"personnedb"},"template":{"metadata":{"creationTimestamp":null,"labels":{"app":"personnedb","deploymentconfig":"personnedb"},"annotations":{"openshift.io/generated-by":"OpenShiftNewApp"}},"spec":{"volumes":[{"name":"personnedb-volume-1","emptyDir":{}},{"name":"personnedb-volume-2","emptyDir":{}}],"containers":[{"name":"personnedb","image":"mongo@sha256:51bdcc462e479c9da4968a67535cd161bc8dd3850cae760efb56e18fb4caae3e","ports":[{"containerPort":27017,"protocol":"TCP"}],"resources":{},"volumeMounts":[{"name":"personnedb-volume-1","mountPath":"/data/configdb"},{"name":"personnedb-volume-2","mountPath":"/data/db"}],"terminationMessagePath":"/dev/termination-log","terminationMessagePolicy":"File","imagePullPolicy":"Always"}],"restartPolicy":"Always","terminationGracePeriodSeconds":30,"dnsPolicy":"ClusterFirst","securityContext":{},"schedulerName":"default-scheduler"}}},"status":{"latestVersion":1,"observedGeneration":2,"replicas":0,"updatedReplicas":0,"availableReplicas":0,"unavailableReplicas":0,"details":{"message":"image change","causes":[{"type":"ImageChange","imageTrigger":{"from":{"kind":"ImageStreamTag","namespace":"msa-dev","name":"personnedb:latest"}}}]},"conditions":[{"type":"Available","status":"False","lastUpdateTime":"2017-11-27T19:45:43Z","lastTransitionTime":"2017-11-27T19:45:43Z","message":"Deployment config does not have minimum availability."}]}}
+    creationTimestamp: null
+    generation: 1
+    labels:
+      app: personnedb
+      openshift.io/deployment-config.name: personnedb
+    name: personnedb-1
+    ownerReferences:
+    - apiVersion: apps.openshift.io/v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: DeploymentConfig
+      name: personnedb
+      uid: 8e613f13-d3ab-11e7-8333-080027b750d6
+  spec:
+    replicas: 1
+    selector:
+      app: personnedb
+      deployment: personnedb-1
+      deploymentconfig: personnedb
+    template:
+      metadata:
+        annotations:
+          openshift.io/deployment-config.latest-version: "1"
+          openshift.io/deployment-config.name: personnedb
+          openshift.io/deployment.name: personnedb-1
+          openshift.io/generated-by: OpenShiftNewApp
+        creationTimestamp: null
+        labels:
+          app: personnedb
+          deployment: personnedb-1
+          deploymentconfig: personnedb
+      spec:
+        containers:
+        - image: mongo@sha256:51bdcc462e479c9da4968a67535cd161bc8dd3850cae760efb56e18fb4caae3e
+          imagePullPolicy: Always
+          name: personnedb
+          ports:
+          - containerPort: 27017
+            protocol: TCP
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+          - mountPath: /data/configdb
+            name: personnedb-volume-1
+          - mountPath: /data/db
+            name: personnedb-volume-2
+        dnsPolicy: ClusterFirst
+        restartPolicy: Always
+        schedulerName: default-scheduler
+        securityContext: {}
+        terminationGracePeriodSeconds: 30
+        volumes:
+        - emptyDir: {}
+          name: personnedb-volume-1
+        - emptyDir: {}
+          name: personnedb-volume-2
+  status:
+    replicas: 0
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/host.generated: "true"
+    creationTimestamp: null
+    name: personneapi
+  spec:
+    host: personneapi-msa-dev.192.168.99.100.nio.io
+    path: /
+    port:
+      targetPort: 8080-tcp
+    tls:
+      termination: edge
+    to:
+      kind: Service
+      name: personneapi
+      weight: 100
+    wildcardPolicy: None
+  status:
+    ingress:
+    - conditions:
+      - lastTransitionTime: 2017-11-29T08:38:11Z
+        status: "True"
+        type: Admitted
+      host: personneapi-msa-dev.192.168.99.100.nio.io
+      routerName: router
+      wildcardPolicy: None
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: personneapi
+    name: personneapi
+  spec:
+    ports:
+    - name: 8080-tcp
+      port: 8080
+      protocol: TCP
+      targetPort: 8080
+    - name: 8443-tcp
+      port: 8443
+      protocol: TCP
+      targetPort: 8443
+    - name: 8778-tcp
+      port: 8778
+      protocol: TCP
+      targetPort: 8778
+    selector:
+      app: personneapi
+      deploymentconfig: personneapi
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Service
+  metadata:
+    annotations:
+      openshift.io/generated-by: OpenShiftNewApp
+    creationTimestamp: null
+    labels:
+      app: personnedb
+    name: personnedb
+  spec:
+    ports:
+    - name: 27017-tcp
+      port: 27017
+      protocol: TCP
+      targetPort: 27017
+    selector:
+      app: personnedb
+      deploymentconfig: personnedb
+    sessionAffinity: None
+    type: ClusterIP
+  status:
+    loadBalancer: {}
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      openshift.io/build.name: personneapi-3
+      openshift.io/scc: privileged
+    creationTimestamp: null
+    labels:
+      openshift.io/build.name: personneapi-3
+    name: personneapi-3-build
+    ownerReferences:
+    - apiVersion: build.openshift.io/v1
+      controller: true
+      kind: Build
+      name: personneapi-3
+      uid: 75598788-d3d2-11e7-8333-080027b750d6
+  spec:
+    containers:
+    - args:
+      - --loglevel=0
+      env:
+      - name: BUILD
+        value: |
+          {"kind":"Build","apiVersion":"v1","metadata":{"name":"personneapi-3","namespace":"msa-dev","selfLink":"/apis/build.openshift.io/v1/namespaces/msa-dev/builds/personneapi-3","uid":"75598788-d3d2-11e7-8333-080027b750d6","resourceVersion":"19284","creationTimestamp":"2017-11-28T00:24:12Z","labels":{"app":"personneapi","buildconfig":"personneapi","openshift.io/build-config.name":"personneapi","openshift.io/build.start-policy":"Serial"},"annotations":{"openshift.io/build-config.name":"personneapi","openshift.io/build.number":"3"},"ownerReferences":[{"apiVersion":"build.openshift.io/v1","kind":"BuildConfig","name":"personneapi","uid":"f9e64292-d3c7-11e7-8333-080027b750d6","controller":true}]},"spec":{"serviceAccount":"builder","source":{"type":"Git","git":{"uri":"https://github.com/nelvadas/microservices-with-openshift.git"},"contextDir":"lab1/msa-personne"},"strategy":{"type":"Source","sourceStrategy":{"from":{"kind":"DockerImage","name":"registry.access.redhat.com/redhat-openjdk-18/openjdk18-openshift@sha256:e980728cea6c4deaf664d20f4568b9f5834a50a3326c9d905ed3b0b77b07c6bf"}}},"output":{"to":{"kind":"DockerImage","name":"172.30.1.1:5000/msa-dev/personneapi:latest"},"pushSecret":{"name":"builder-dockercfg-0f8kb"}},"resources":{},"postCommit":{},"nodeSelector":null,"triggeredBy":[{"message":"Manually triggered"}]},"status":{"phase":"New","outputDockerImageReference":"172.30.1.1:5000/msa-dev/personneapi:latest","config":{"kind":"BuildConfig","namespace":"msa-dev","name":"personneapi"},"output":{}}}
+      - name: SOURCE_REPOSITORY
+        value: https://github.com/nelvadas/microservices-with-openshift.git
+      - name: SOURCE_URI
+        value: https://github.com/nelvadas/microservices-with-openshift.git
+      - name: SOURCE_CONTEXT_DIR
+        value: lab1/msa-personne
+      - name: ORIGIN_VERSION
+        value: v3.6.173.0.21
+      - name: ALLOWED_UIDS
+        value: 1-
+      - name: DROP_CAPS
+        value: KILL,MKNOD,SETGID,SETUID,SYS_CHROOT
+      - name: PUSH_DOCKERCFG_PATH
+        value: /var/run/secrets/openshift.io/push
+      image: registry.access.redhat.com/openshift3/ose-sti-builder:v3.6.173.0.21
+      imagePullPolicy: IfNotPresent
+      name: sti-build
+      resources: {}
+      securityContext:
+        privileged: true
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: FallbackToLogsOnError
+      volumeMounts:
+      - mountPath: /var/run/docker.sock
+        name: docker-socket
+      - mountPath: /var/run/secrets/openshift.io/push
+        name: builder-dockercfg-0f8kb-push
+        readOnly: true
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: builder-token-ll6dn
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: builder-dockercfg-0f8kb
+    nodeName: localhost
+    restartPolicy: Never
+    schedulerName: default-scheduler
+    securityContext: {}
+    serviceAccount: builder
+    serviceAccountName: builder
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - hostPath:
+        path: /var/run/docker.sock
+      name: docker-socket
+    - name: builder-dockercfg-0f8kb-push
+      secret:
+        defaultMode: 420
+        secretName: builder-dockercfg-0f8kb
+    - name: builder-token-ll6dn
+      secret:
+        defaultMode: 420
+        secretName: builder-token-ll6dn
+  status:
+    phase: Pending
+    qosClass: BestEffort
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubernetes.io/created-by: |
+        {"kind":"SerializedReference","apiVersion":"v1","reference":{"kind":"ReplicationController","namespace":"msa-dev","name":"personneapi-4","uid":"0e4166f1-d3d6-11e7-8333-080027b750d6","apiVersion":"v1","resourceVersion":"19675"}}
+      openshift.io/deployment-config.latest-version: "4"
+      openshift.io/deployment-config.name: personneapi
+      openshift.io/deployment.name: personneapi-4
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/scc: anyuid
+    creationTimestamp: null
+    generateName: personneapi-4-
+    labels:
+      app: personneapi
+      deployment: personneapi-4
+      deploymentconfig: personneapi
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicationController
+      name: personneapi-4
+      uid: 0e4166f1-d3d6-11e7-8333-080027b750d6
+  spec:
+    containers:
+    - image: 172.30.1.1:5000/msa-dev/personneapi@sha256:fce7e62a4fbb0ba79942bae870468843edaa4ef5577e0eb849e00ead9585c4c3
+      imagePullPolicy: Always
+      name: personneapi
+      ports:
+      - containerPort: 8080
+        protocol: TCP
+      - containerPort: 8443
+        protocol: TCP
+      - containerPort: 8778
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          drop:
+          - MKNOD
+          - SYS_CHROOT
+        privileged: false
+        seLinuxOptions:
+          level: s0:c9,c4
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /deployments/config
+        name: props-vol
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-jmvgk
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: default-dockercfg-95ddl
+    nodeName: localhost
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      seLinuxOptions:
+        level: s0:c9,c4
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - configMap:
+        defaultMode: 420
+        name: props-volume-cm
+      name: props-vol
+    - name: default-token-jmvgk
+      secret:
+        defaultMode: 420
+        secretName: default-token-jmvgk
+  status:
+    phase: Pending
+    qosClass: BestEffort
+- apiVersion: v1
+  kind: Pod
+  metadata:
+    annotations:
+      kubernetes.io/created-by: |
+        {"kind":"SerializedReference","apiVersion":"v1","reference":{"kind":"ReplicationController","namespace":"msa-dev","name":"personnedb-1","uid":"8f7cb3c3-d3ab-11e7-8333-080027b750d6","apiVersion":"v1","resourceVersion":"15647"}}
+      openshift.io/deployment-config.latest-version: "1"
+      openshift.io/deployment-config.name: personnedb
+      openshift.io/deployment.name: personnedb-1
+      openshift.io/generated-by: OpenShiftNewApp
+      openshift.io/scc: anyuid
+    creationTimestamp: null
+    generateName: personnedb-1-
+    labels:
+      app: personnedb
+      deployment: personnedb-1
+      deploymentconfig: personnedb
+    ownerReferences:
+    - apiVersion: v1
+      blockOwnerDeletion: true
+      controller: true
+      kind: ReplicationController
+      name: personnedb-1
+      uid: 8f7cb3c3-d3ab-11e7-8333-080027b750d6
+  spec:
+    containers:
+    - image: mongo@sha256:51bdcc462e479c9da4968a67535cd161bc8dd3850cae760efb56e18fb4caae3e
+      imagePullPolicy: Always
+      name: personnedb
+      ports:
+      - containerPort: 27017
+        protocol: TCP
+      resources: {}
+      securityContext:
+        capabilities:
+          drop:
+          - MKNOD
+          - SYS_CHROOT
+        privileged: false
+        seLinuxOptions:
+          level: s0:c9,c4
+      terminationMessagePath: /dev/termination-log
+      terminationMessagePolicy: File
+      volumeMounts:
+      - mountPath: /data/configdb
+        name: personnedb-volume-1
+      - mountPath: /data/db
+        name: personnedb-volume-2
+      - mountPath: /var/run/secrets/kubernetes.io/serviceaccount
+        name: default-token-jmvgk
+        readOnly: true
+    dnsPolicy: ClusterFirst
+    imagePullSecrets:
+    - name: default-dockercfg-95ddl
+    nodeName: localhost
+    restartPolicy: Always
+    schedulerName: default-scheduler
+    securityContext:
+      seLinuxOptions:
+        level: s0:c9,c4
+    serviceAccount: default
+    serviceAccountName: default
+    terminationGracePeriodSeconds: 30
+    volumes:
+    - emptyDir: {}
+      name: personnedb-volume-1
+    - emptyDir: {}
+      name: personnedb-volume-2
+    - name: default-token-jmvgk
+      secret:
+        defaultMode: 420
+        secretName: default-token-jmvgk
+  status:
+    phase: Pending
+    qosClass: BestEffort

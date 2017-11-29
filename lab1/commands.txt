@@ -1,0 +1,20 @@
+oc login 10.1.2.2:8443 -u admin -p admin
+oc new-project  msa-dev
+oc new-app --docker-image=mongo:latest --name=personnedb
+
+
+#Optionnal: create the openjdk is in openshift namespace if you installation do not have it
+oc create -f openjdk-s2i-imagestream.json -n openshift
+
+oc new-app redhat-openjdk18-openshift~https://github.com/nelvadas/microservices-with-openshift.git \
+           --context-dir=lab1/msa-personne --name=personneapi
+
+cd microservices-with-openshift/lab1/msa-personne
+oc create cm props-volume-cm --from-file=./configMap/dev/
+
+oc volume --add=true  --mount-path=/deployments/config --configmap-name=props-volume-cm --name=props-vol dc/personneapi
+
+oc expose --path=/ svc/personneapi
+
+curl http://personneapi-msa-dev.192.168.99.100.nip.io/health
+
