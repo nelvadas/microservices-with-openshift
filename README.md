@@ -22,7 +22,7 @@ The following labs are completed and tested on an Openshift 3.6
 The lab series is organized around the folowing items
 
 * [Lab 1](./lab1/): Building and Running  a SpringBoot/MongoDB Microservice Application on Openshift using S2i.
-* [Lab 2](./lab2/): Creating Reusable Application Templates
+* [Lab 2](./lab2/): Creating Persistent Databases and  Reusable Application Templates
 * [Lab 3](./lab3/): Continuous Integration and Delivery with Jenkins Pipelines
 * [Lab 4](./lab4/): Circuit Breaker Pattern 
 * [Lab 5](./lab5/): Envent Streaming  with  Apache Kafka

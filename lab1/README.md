@@ -284,6 +284,6 @@ The /health URI is automatically configured in the spring boot application by ad
 
 ### Next Steps <a name="introduction"></a>
 
-* [Lab 2](../lab2/): Creating Reusable Application Templates
+* [Lab 2](../lab2/): Creating Persistent Database and  Reusable Application Templates
 * [Lab 3](../lab3/): CI/CD with Jenkins2  Pipenlines
 
