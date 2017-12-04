@@ -1,0 +1,261 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "personneapi-template",
+        "creationTimestamp": null
+    },
+
+"parameters": [
+        {
+            "displayName": "Application Name",
+            "description": "The name for the application.",
+            "name": "APPLICATION_NAME",
+            "value": "msa",
+            "required": true
+        },
+        {
+            "displayName": "Application Environment ",
+            "description": "Environment used to create the namespace . Allowed values are: `dev`, `uat`, `pprod` and `prod`.",
+            "name": "APPLICATION_ENV",
+            "value": "uat",
+            "required": true
+        },
+ 
+      {
+              "displayName": "Image Tag ",
+              "description": "Environment used to create the namespace . following values can be used,`uatReady` `prodReady`",
+              "name": "IMAGE_TAG",
+              "value": "uatReady",
+              "required": false
+         }
+ 
+]
+,
+
+
+    "objects": [
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "personneapi",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "personneapi"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "personneapi"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "${APPLICATION_NAME}-${APPLICATION_ENV}",
+                                "name": "personneapi:${IMAGE_TAG}"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "app": "personneapi",
+                    "deploymentconfig": "personneapi"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "personneapi",
+                            "deploymentconfig": "personneapi"
+                        },
+                        "annotations": {
+                            "openshift.io/container.personneapi.image.entrypoint": "[\"/usr/local/s2i/run\"]",
+                            "openshift.io/generated-by": "OpenShiftNewApp"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "props-vol",
+                                "configMap": {
+                                    "name": "props-volume-cm",
+                                    "defaultMode": 420
+                                }
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "personneapi",
+                                "image": "172.30.1.1:5000/msa-dev/personneapi@sha256:02a9e15d52fe5eb6bfda086d5834a4203d8264fa686ede0941c3bebe1e313082",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8443,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "props-vol",
+                                        "mountPath": "/deployments/config"
+                                    }
+                                ],
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "personneapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "personneapi"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    },
+                    {
+                        "name": "8443-tcp",
+                        "protocol": "TCP",
+                        "port": 8443,
+                        "targetPort": 8443
+                    },
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    }
+                ],
+                "selector": {
+                    "app": "personneapi",
+                    "deploymentconfig": "personneapi"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "personneapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "personneapi"
+                },
+                "annotations": {
+                    "openshift.io/host.generated": "true"
+                }
+            },
+            "spec": {
+                "host": "personneapi-${APPLICATION_NAME}-${APPLICATION_ENV}.192.168.99.100.nip.io",
+                "path": "/",
+                "to": {
+                    "kind": "Service",
+                    "name": "personneapi",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                },
+                "wildcardPolicy": "None"
+            },
+            "status": {
+                "ingress": [
+                    {
+                        "host": "personneapi-${APPLICATION_NAME}-${APPLICATION_ENV}.192.168.99.100.nip.io",
+                        "routerName": "router",
+                        "conditions": [
+                            {
+                                "type": "Admitted",
+                                "status": "True",
+                                "lastTransitionTime": "2017-11-29T15:45:47Z"
+                            }
+                        ],
+                        "wildcardPolicy": "None"
+                    }
+                ]
+            }
+        }
+    ]
+}
