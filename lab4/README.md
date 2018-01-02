@@ -37,7 +37,7 @@ Regarding SpringBoot Microservices, applications can leverage <a href=https://cl
 
 lab4 will be implemented in a new openshift project  **circuit-breaker** 
 
-``
+```
  oc new-project circuit-breaker
 ```
 
@@ -95,7 +95,7 @@ hystrix-dashboard   hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io     
 turbine-server      turbine-server-circuit-breaker.192.168.99.100.nip.io                turbine-server      http
 ```
 
-![Hystrix and turbine pods](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-and-turbine-pods.png) 
+![Hystrix and turbine pods](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-and-turbine-pods.png " Pods") 
 
 
 #### Use Case  <a name="usecase"></a>
