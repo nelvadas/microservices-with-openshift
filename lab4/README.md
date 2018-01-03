@@ -186,16 +186,86 @@ echo ' {"owner": "1", "accountType": "LivretA", "status" :"active", "balance": 5
 
 
 echo ' {"owner": "1", "accountType": "LDD", "status" :"active", "balance": 300.00 }'| curl -H 'Content-Type: Application/json' -X POST -d @-  http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account/
+
+Add an account for user N°2
+
+$ echo ' {"owner": "2", "accountType": "CompteCourant", "status" :"active", "balance": 15.60 }'| curl  'Content-Type: Application/json'     -X POST -d @-  http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account/
+
+
 ```
 
 Check the account list for this user.
 
+```
+$ curl  http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account/1
+HTTP/1.1 200
+Cache-control: private
+Content-Type: application/json;charset=UTF-8
+Date: Tue, 02 Jan 2018 07:09:33 GMT
+Set-Cookie: 7a7e76b0d8a493826cc96ebc81499590=72bb996b6478da2c918265aee1c6501e; path=/; HttpOnly
+Transfer-Encoding: chunked
+X-Application-Context: application
+
+[
+    {
+        "accountType": "CompteCourant",
+        "balance": 10.0,
+        "creationDate": null,
+        "id": "5a4b2e29dc0e8200013fb122",
+        "owner": "1",
+        "status": "active"
+    },
+    {
+        "accountType": "LivretA",
+        "balance": 500.0,
+        "creationDate": null,
+        "id": "5a4b2e9adc0e8200013fb123",
+        "owner": "1",
+        "status": "active"
+    },
+    {
+        "accountType": "LDD",
+        "balance": 300.0,
+        "creationDate": null,
+        "id": "5a4b2ea7dc0e8200013fb124",
+        "owner": "1",
+        "status": "active"
+    }
+]
+```
 
 
 
 
-##  Personne Microservice with Hystrix dependency <a name="updatepersonne"></a>
+##  Customer  Microservice with Hystrix dependency <a name="updatepersonne"></a>
 #### EnableCircuitBreaker and HystrixCommand<a name="hystrixintegration"></a>
+
+#### Deployment in Openshift
+* Create the CustomerAPI application
+```
+oc new-app redhat-openjdk18-openshift~https://github.com/nelvadas/microservices-with-openshift.git --context-dir=lab4/msa-customer  --name=customerapi
+```
+
+
+* Prepare the  rigth application.properties file to supply configMap
+``` 
+$ cd microservices-with-openshift/lab4/msa-customer/configMap/dev
+$ cat application.properties
+  account.svc.url=http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account
+  personne.svc.url=http://personneapi-msa-dev.192.168.99.100.nip.io/Personne/
+```
+* Create the msa-customer-props-volume-cm
+```
+$ oc create cm msa-customer-props-volume-cm --from-file=.
+configmap "msa-customer-props-volume-cm" created
+```
+
+* Mount a volume on /deployments/config
+```
+oc volume --add=true  --mount-path=/deployments/config --configmap-name=msa-customer-props-volume-cm --name=props-vol dc/customerapi
+```
+
+
 #### Demo: circuit closed <a name="democircuitclosed"></a>
 #### Demo: circuit open <a name="democircuitopen"></a>
 
