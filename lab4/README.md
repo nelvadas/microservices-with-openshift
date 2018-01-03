@@ -108,8 +108,91 @@ http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io/monitor/monitor.h
 
 ### Account List Microservice<a name="accountmsa"></a>
 
-#### Creating application from template <a name="accountmsa-template"></a>
+#### Creating application  <a name="accountmsa-template"></a>
+To create the Account Micro service in the circuit-breaker namespace, you can use the following command template.
+
+```
+oc process https://raw.githubusercontent.com/nelvadas/microservices-with-openshift/master/lab4/accountapi-template-v1.0.0.json | oc create -f -
+```
+If you are using another namespace, you may need to edit the template first to match your specific parameters.
+However You can also create the msa-account application from scratch step by step using the following instructions.
+The two processes give the same results.
+
+* Create the account MongoDB
+```
+oc new-app --docker-image=mongo:latest --name=accountdb
+```
+
+* Create the Account Microservice
+```
+oc new-app redhat-openjdk18-openshift~https://github.com/nelvadas/microservices-with-openshift.git            --context-dir=lab4/msa-account  --name=accountapi
+```
+If the imagestream is not present on you cluster you can use the following instruction to install it
+
+```
+oc create -f https://raw.githubusercontent.com/nelvadas/microservices-with-openshift/master/lab1/openjdk-s2i-imagestream.json -n \
+openshift
+```
+
+* Create a configMap and mount it as volume to server application.properties
+```
+$ cd microservices-with-openshift/lab4/msa-account/configMap/dev
+$ cat application.properties
+spring.data.mongodb.host=accountdb
+spring.data.mongodb.port=27017
+$ oc create cm account-props-volume-cm --from-file=.
+configmap "account-props-volume-cm" created
+```
+
+* Mount the configMap as volume on /deployment/config folder.
+```
+$ oc volume --add=true  --mount-path=/deployments/config --configmap-name=account-props-volume-cm --name=props-vol dc/accountapi 
+deploymentconfig "accountapi" updated
+```
+The Account DB Application should be up and running 
+```
+$ oc get pods
+NAME                        READY     STATUS      RESTARTS   AGE
+accountapi-1-build          0/1       Completed   0          1d
+accountapi-2-q2hrd          1/1       Running     0          1d
+accountdb-1-ds8tf           1/1       Running     0          1d
+hystrix-dashboard-1-6gcdd   1/1       Running     0          1d
+turbine-server-1-1f1jx      1/1       Running     0          1d
+```
+* Expose the accountapi 
+```
+$ oc expose svc/accountapi
+```
+* Set probes
+```
+oc set probe dc/accountapi  --readiness  --initial-delay-seconds=5  --get-url=http://:8080/health
+oc set probe dc/accountapi  --liveness  --initial-delay-seconds=0  --get-url=http://:8080/health
+```
+
 #### Testing the Application <a name="demodata"></a>
+
+In this section, we are going to create a set of accounts for the user Number 1.
+```
+$ echo ' {"owner": "1", "accountType": "CompteCourant", "status" :"active", "balance": 10.00 }'| curl  'Content-Type: Application/json' -X POST -d @-  http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account/
+
+Result: {"id":"5a4b2e29dc0e8200013fb122","owner":"1","accountType":"CompteCourant","creationDate":null,"balance":10.0,"status":"active"}
+```
+
+Run the following command to add more account to user N°1
+
+```
+echo ' {"owner": "1", "accountType": "LivretA", "status" :"active", "balance": 500.00 }'| curl -H 'Content-Type: Application/json' -X POST -d @-  http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account/
+
+
+
+echo ' {"owner": "1", "accountType": "LDD", "status" :"active", "balance": 300.00 }'| curl -H 'Content-Type: Application/json' -X POST -d @-  http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account/
+```
+
+Check the account list for this user.
+
+
+
+
 
 ##  Personne Microservice with Hystrix dependency <a name="updatepersonne"></a>
 #### EnableCircuitBreaker and HystrixCommand<a name="hystrixintegration"></a>

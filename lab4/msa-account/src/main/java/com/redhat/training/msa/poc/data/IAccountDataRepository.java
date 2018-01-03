@@ -8,7 +8,7 @@ import com.redhat.training.msa.poc.model.Account;
 
 public interface IAccountDataRepository extends MongoRepository<Account, String> {
 	
-	public Account findByOwner(String owner);
+	public List<Account> findByOwner(String owner);
 	public List<Account> findAll();
 	
 

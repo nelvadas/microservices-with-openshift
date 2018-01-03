@@ -1,6 +1,7 @@
 package com.redhat.training.msa.poc;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -36,8 +37,8 @@ public class AccountController {
     		         method = RequestMethod.GET,
     		         produces = {MediaType.APPLICATION_JSON_VALUE} 
     		        )
-    public Account findByRef(@PathVariable(value = "owner") String owner) {
-    	 Account accounts= repository.findByOwner(owner);
+    public List<Account> findByRef(@PathVariable(value = "owner") String owner) {
+    	List<Account> accounts= repository.findByOwner(owner);
     	 System.out.println("findByOwner:"+accounts);
     	 return accounts;
     }
