@@ -1,0 +1,1172 @@
+{
+    "kind": "Template",
+    "apiVersion": "v1",
+    "metadata": {
+        "name": "lab4-template",
+        "creationTimestamp": null
+    },
+    "objects": [
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "accountapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "accountapi"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "zQqc05mOFv_HTKuecbu7"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "rDde7KQUFbBJb2-y7UEL"
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    }
+                ],
+                "runPolicy": "Serial",
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/nelvadas/microservices-with-openshift.git"
+                    },
+                    "contextDir": "lab4/msa-account"
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "redhat-openjdk18-openshift:latest"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "accountapi:latest"
+                    }
+                },
+                "resources": {},
+                "postCommit": {},
+                "nodeSelector": null
+            },
+            "status": {
+                "lastVersion": 0
+            }
+        },
+        {
+            "kind": "BuildConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "customerapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "customerapi"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "triggers": [
+                    {
+                        "type": "GitHub",
+                        "github": {
+                            "secret": "a8y0FHFsCzNmWfjUVi5h"
+                        }
+                    },
+                    {
+                        "type": "Generic",
+                        "generic": {
+                            "secret": "0N-26P04XT37mdfnTSwQ"
+                        }
+                    },
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChange": {}
+                    }
+                ],
+                "runPolicy": "Serial",
+                "source": {
+                    "type": "Git",
+                    "git": {
+                        "uri": "https://github.com/nelvadas/microservices-with-openshift.git"
+                    },
+                    "contextDir": "lab4/msa-customer"
+                },
+                "strategy": {
+                    "type": "Source",
+                    "sourceStrategy": {
+                        "from": {
+                            "kind": "ImageStreamTag",
+                            "namespace": "openshift",
+                            "name": "redhat-openjdk18-openshift:latest"
+                        }
+                    }
+                },
+                "output": {
+                    "to": {
+                        "kind": "ImageStreamTag",
+                        "name": "customerapi:latest"
+                    }
+                },
+                "resources": {},
+                "postCommit": {},
+                "nodeSelector": null
+            },
+            "status": {
+                "lastVersion": 0
+            }
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "accountapi",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "accountapi"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "accountapi"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "circuit-breaker",
+                                "name": "accountapi:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "app": "accountapi",
+                    "deploymentconfig": "accountapi"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "accountapi",
+                            "deploymentconfig": "accountapi"
+                        },
+                        "annotations": {
+                            "openshift.io/container.accountapi.image.entrypoint": "[\"/usr/local/s2i/run\"]",
+                            "openshift.io/generated-by": "OpenShiftNewApp"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "props-vol",
+                                "configMap": {
+                                    "name": "account-props-volume-cm",
+                                    "defaultMode": 420
+                                }
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "accountapi",
+                                "image": "172.30.1.1:5000/circuit-breaker/accountapi@sha256:3a31d2b026a4e3a1cb1ca242c8c9c4f3be5bbbc2d8a984a37a1d05959a15bdc2",
+                                "ports": [
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8443,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "props-vol",
+                                        "mountPath": "/deployments/config"
+                                    }
+                                ],
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "accountdb",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "accountdb"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "accountdb"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "circuit-breaker",
+                                "name": "accountdb:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "app": "accountdb",
+                    "deploymentconfig": "accountdb"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "accountdb",
+                            "deploymentconfig": "accountdb"
+                        },
+                        "annotations": {
+                            "openshift.io/container.accountdb.image.entrypoint": "[\"docker-entrypoint.sh\",\"mongod\"]",
+                            "openshift.io/generated-by": "OpenShiftNewApp"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "accountdb-volume-1",
+                                "emptyDir": {}
+                            },
+                            {
+                                "name": "accountdb-volume-2",
+                                "emptyDir": {}
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "accountdb",
+                                "image": "mongo@sha256:56210d12db53301f71b6f3d38c200c54d9e4722d4884605f6bb24876613efb2f",
+                                "ports": [
+                                    {
+                                        "containerPort": 27017,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "accountdb-volume-1",
+                                        "mountPath": "/data/configdb"
+                                    },
+                                    {
+                                        "name": "accountdb-volume-2",
+                                        "mountPath": "/data/db"
+                                    }
+                                ],
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "customerapi",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "customerapi"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 600,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    },
+                    {
+                        "type": "ImageChange",
+                        "imageChangeParams": {
+                            "automatic": true,
+                            "containerNames": [
+                                "customerapi"
+                            ],
+                            "from": {
+                                "kind": "ImageStreamTag",
+                                "namespace": "circuit-breaker",
+                                "name": "customerapi:latest"
+                            }
+                        }
+                    }
+                ],
+                "replicas": 2,
+                "test": false,
+                "selector": {
+                    "app": "customerapi",
+                    "deploymentconfig": "customerapi"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "app": "customerapi",
+                            "deploymentconfig": "customerapi"
+                        },
+                        "annotations": {
+                            "openshift.io/container.customerapi.image.entrypoint": "[\"/usr/local/s2i/run\"]",
+                            "openshift.io/generated-by": "OpenShiftNewApp"
+                        }
+                    },
+                    "spec": {
+                        "volumes": [
+                            {
+                                "name": "props-vol",
+                                "configMap": {
+                                    "name": "msa-customer-props-volume-cm",
+                                    "defaultMode": 420
+                                }
+                            }
+                        ],
+                        "containers": [
+                            {
+                                "name": "customerapi",
+                                "image": "172.30.1.1:5000/circuit-breaker/customerapi@sha256:44242b19cc4434bcd6fbc7f9b06381f50d57c83356633f3d463e1f7384be13b7",
+                                "ports": [
+                                    {
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8443,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "resources": {},
+                                "volumeMounts": [
+                                    {
+                                        "name": "props-vol",
+                                        "mountPath": "/deployments/config"
+                                    }
+                                ],
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 5,
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "Always"
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "turbine-server",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "turbine-server",
+                    "provider": "fabric8",
+                    "version": "1.0.28"
+                },
+                "annotations": {
+                    "fabric8.io/git-branch": "release-v1.0.28",
+                    "fabric8.io/git-commit": "2656e3679d0034bb63c83e429f17135b30ed7d71",
+                    "fabric8.io/iconUrl": "img/icons/spring-boot.svg",
+                    "fabric8.io/metrics-path": "dashboard/file/kubernetes-pods.json/?var-project=turbine-server\u0026var-version=1.0.28"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 10800,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "turbine-server",
+                    "provider": "fabric8"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "group": "io.fabric8.kubeflix",
+                            "project": "turbine-server",
+                            "provider": "fabric8",
+                            "version": "1.0.28"
+                        },
+                        "annotations": {
+                            "fabric8.io/git-branch": "release-v1.0.28",
+                            "fabric8.io/git-commit": "2656e3679d0034bb63c83e429f17135b30ed7d71",
+                            "fabric8.io/iconUrl": "img/icons/spring-boot.svg",
+                            "fabric8.io/metrics-path": "dashboard/file/kubernetes-pods.json/?var-project=turbine-server\u0026var-version=1.0.28"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "turbine-server",
+                                "image": "fabric8/turbine-server:1.0.28",
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    },
+                                    {
+                                        "name": "jolokia",
+                                        "containerPort": 8778,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "KUBERNETES_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "name": "TURBINE_INSTANCEURLSUFFIX",
+                                        "value": ":8080/hystrix.stream"
+                                    }
+                                ],
+                                "resources": {},
+                                "livenessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 180,
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "readinessProbe": {
+                                    "httpGet": {
+                                        "path": "/health",
+                                        "port": 8080,
+                                        "scheme": "HTTP"
+                                    },
+                                    "initialDelaySeconds": 10,
+                                    "timeoutSeconds": 1,
+                                    "periodSeconds": 10,
+                                    "successThreshold": 1,
+                                    "failureThreshold": 3
+                                },
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "IfNotPresent",
+                                "securityContext": {
+                                    "privileged": false
+                                }
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "serviceAccountName": "turbine",
+                        "serviceAccount": "turbine",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "DeploymentConfig",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hystrix-dashboard",
+                "generation": 1,
+                "creationTimestamp": null,
+                "labels": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "hystrix-dashboard",
+                    "provider": "fabric8",
+                    "version": "1.0.28"
+                },
+                "annotations": {
+                    "fabric8.io/git-branch": "release-v1.0.28",
+                    "fabric8.io/git-commit": "2656e3679d0034bb63c83e429f17135b30ed7d71",
+                    "fabric8.io/metrics-path": "dashboard/file/kubernetes-pods.json/?var-project=hystrix-dashboard\u0026var-version=1.0.28"
+                }
+            },
+            "spec": {
+                "strategy": {
+                    "type": "Rolling",
+                    "rollingParams": {
+                        "updatePeriodSeconds": 1,
+                        "intervalSeconds": 1,
+                        "timeoutSeconds": 10800,
+                        "maxUnavailable": "25%",
+                        "maxSurge": "25%"
+                    },
+                    "resources": {}
+                },
+                "triggers": [
+                    {
+                        "type": "ConfigChange"
+                    }
+                ],
+                "replicas": 1,
+                "test": false,
+                "selector": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "hystrix-dashboard",
+                    "provider": "fabric8"
+                },
+                "template": {
+                    "metadata": {
+                        "creationTimestamp": null,
+                        "labels": {
+                            "group": "io.fabric8.kubeflix",
+                            "project": "hystrix-dashboard",
+                            "provider": "fabric8",
+                            "version": "1.0.28"
+                        },
+                        "annotations": {
+                            "fabric8.io/git-branch": "release-v1.0.28",
+                            "fabric8.io/git-commit": "2656e3679d0034bb63c83e429f17135b30ed7d71",
+                            "fabric8.io/metrics-path": "dashboard/file/kubernetes-pods.json/?var-project=hystrix-dashboard\u0026var-version=1.0.28"
+                        }
+                    },
+                    "spec": {
+                        "containers": [
+                            {
+                                "name": "hystrix-dashboard",
+                                "image": "fabric8/hystrix-dashboard:1.0.28",
+                                "ports": [
+                                    {
+                                        "name": "http",
+                                        "containerPort": 8080,
+                                        "protocol": "TCP"
+                                    }
+                                ],
+                                "env": [
+                                    {
+                                        "name": "KUBERNETES_NAMESPACE",
+                                        "valueFrom": {
+                                            "fieldRef": {
+                                                "apiVersion": "v1",
+                                                "fieldPath": "metadata.namespace"
+                                            }
+                                        }
+                                    }
+                                ],
+                                "resources": {},
+                                "terminationMessagePath": "/dev/termination-log",
+                                "imagePullPolicy": "IfNotPresent",
+                                "securityContext": {
+                                    "privileged": false
+                                }
+                            }
+                        ],
+                        "restartPolicy": "Always",
+                        "terminationGracePeriodSeconds": 30,
+                        "dnsPolicy": "ClusterFirst",
+                        "serviceAccountName": "ribbon",
+                        "serviceAccount": "ribbon",
+                        "securityContext": {}
+                    }
+                }
+            },
+            "status": {}
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "accountapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "accountapi"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    },
+                    {
+                        "name": "8443-tcp",
+                        "protocol": "TCP",
+                        "port": 8443,
+                        "targetPort": 8443
+                    },
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    }
+                ],
+                "selector": {
+                    "app": "accountapi",
+                    "deploymentconfig": "accountapi"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "accountdb",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "accountdb"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "27017-tcp",
+                        "protocol": "TCP",
+                        "port": 27017,
+                        "targetPort": 27017
+                    }
+                ],
+                "selector": {
+                    "app": "accountdb",
+                    "deploymentconfig": "accountdb"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "customerapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "customerapi",
+                    "hystrix.cluster": "default",
+                    "hystrix.enabled": "true"
+                },
+                "annotations": {
+                    "openshift.io/generated-by": "OpenShiftNewApp"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "8080-tcp",
+                        "protocol": "TCP",
+                        "port": 8080,
+                        "targetPort": 8080
+                    },
+                    {
+                        "name": "8443-tcp",
+                        "protocol": "TCP",
+                        "port": 8443,
+                        "targetPort": 8443
+                    },
+                    {
+                        "name": "8778-tcp",
+                        "protocol": "TCP",
+                        "port": 8778,
+                        "targetPort": 8778
+                    }
+                ],
+                "selector": {
+                    "app": "customerapi",
+                    "deploymentconfig": "customerapi"
+                },
+                "type": "ClusterIP",
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hystrix-dashboard",
+                "creationTimestamp": null,
+                "labels": {
+                    "expose": "true",
+                    "group": "io.fabric8.kubeflix",
+                    "project": "hystrix-dashboard",
+                    "provider": "fabric8",
+                    "version": "1.0.28"
+                },
+                "annotations": {
+                    "fabric8.io/app-menu": "management",
+                    "fabric8.io/git-branch": "release-v1.0.28",
+                    "fabric8.io/git-commit": "2656e3679d0034bb63c83e429f17135b30ed7d71"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "protocol": "TCP",
+                        "port": 80,
+                        "targetPort": 8080,
+                        "nodePort": 32019
+                    }
+                ],
+                "selector": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "hystrix-dashboard",
+                    "provider": "fabric8"
+                },
+                "type": "LoadBalancer",
+                "externalIPs": [
+                    "172.29.67.65"
+                ],
+                "deprecatedPublicIPs": [
+                    "172.29.67.65"
+                ],
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Service",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "turbine-server",
+                "creationTimestamp": null,
+                "labels": {
+                    "expose": "true",
+                    "group": "io.fabric8.kubeflix",
+                    "project": "turbine-server",
+                    "provider": "fabric8",
+                    "version": "1.0.28"
+                },
+                "annotations": {
+                    "fabric8.io/git-branch": "release-v1.0.28",
+                    "fabric8.io/git-commit": "2656e3679d0034bb63c83e429f17135b30ed7d71",
+                    "fabric8.io/iconUrl": "img/icons/spring-boot.svg",
+                    "servicepath": "/turbine.stream"
+                }
+            },
+            "spec": {
+                "ports": [
+                    {
+                        "name": "http",
+                        "protocol": "TCP",
+                        "port": 80,
+                        "targetPort": 8080,
+                        "nodePort": 31415
+                    }
+                ],
+                "selector": {
+                    "group": "io.fabric8.kubeflix",
+                    "project": "turbine-server",
+                    "provider": "fabric8"
+                },
+                "type": "LoadBalancer",
+                "externalIPs": [
+                    "172.29.150.170"
+                ],
+                "deprecatedPublicIPs": [
+                    "172.29.150.170"
+                ],
+                "sessionAffinity": "None"
+            },
+            "status": {
+                "loadBalancer": {}
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "accountapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "accountapi"
+                },
+                "annotations": {
+                    "openshift.io/host.generated": "true"
+                }
+            },
+            "spec": {
+                "host": "accountapi-circuit-breaker.192.168.99.100.nip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "accountapi",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                },
+                "wildcardPolicy": "None"
+            },
+            "status": {
+                "ingress": [
+                    {
+                        "host": "accountapi-circuit-breaker.192.168.99.100.nip.io",
+                        "routerName": "router",
+                        "conditions": [
+                            {
+                                "type": "Admitted",
+                                "status": "True",
+                                "lastTransitionTime": "2018-01-02T06:36:35Z"
+                            }
+                        ],
+                        "wildcardPolicy": "None"
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "customerapi",
+                "creationTimestamp": null,
+                "labels": {
+                    "app": "customerapi"
+                },
+                "annotations": {
+                    "openshift.io/host.generated": "true"
+                }
+            },
+            "spec": {
+                "host": "customerapi-circuit-breaker.192.168.99.100.nip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "customerapi",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "8080-tcp"
+                },
+                "wildcardPolicy": "None"
+            },
+            "status": {
+                "ingress": [
+                    {
+                        "host": "customerapi-circuit-breaker.192.168.99.100.nip.io",
+                        "routerName": "router",
+                        "conditions": [
+                            {
+                                "type": "Admitted",
+                                "status": "True",
+                                "lastTransitionTime": "2018-01-02T10:36:00Z"
+                            }
+                        ],
+                        "wildcardPolicy": "None"
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "hystrix-dashboard",
+                "creationTimestamp": null,
+                "labels": {
+                    "expose": "true",
+                    "group": "io.fabric8.kubeflix",
+                    "project": "hystrix-dashboard",
+                    "provider": "fabric8",
+                    "version": "1.0.28"
+                },
+                "annotations": {
+                    "openshift.io/host.generated": "true"
+                }
+            },
+            "spec": {
+                "host": "hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "hystrix-dashboard",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": 8080
+                },
+                "wildcardPolicy": "None"
+            },
+            "status": {
+                "ingress": [
+                    {
+                        "host": "hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io",
+                        "routerName": "router",
+                        "conditions": [
+                            {
+                                "type": "Admitted",
+                                "status": "True",
+                                "lastTransitionTime": "2018-01-02T04:50:55Z"
+                            }
+                        ],
+                        "wildcardPolicy": "None"
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "Route",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "turbine-server",
+                "creationTimestamp": null,
+                "labels": {
+                    "expose": "true",
+                    "group": "io.fabric8.kubeflix",
+                    "project": "turbine-server",
+                    "provider": "fabric8",
+                    "version": "1.0.28"
+                },
+                "annotations": {
+                    "openshift.io/host.generated": "true"
+                }
+            },
+            "spec": {
+                "host": "turbine-server-circuit-breaker.192.168.99.100.nip.io",
+                "to": {
+                    "kind": "Service",
+                    "name": "turbine-server",
+                    "weight": 100
+                },
+                "port": {
+                    "targetPort": "http"
+                },
+                "wildcardPolicy": "None"
+            },
+            "status": {
+                "ingress": [
+                    {
+                        "host": "turbine-server-circuit-breaker.192.168.99.100.nip.io",
+                        "routerName": "router",
+                        "conditions": [
+                            {
+                                "type": "Admitted",
+                                "status": "True",
+                                "lastTransitionTime": "2018-01-02T04:10:01Z"
+                            }
+                        ],
+                        "wildcardPolicy": "None"
+                    }
+                ]
+            }
+        },
+        {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "account-props-volume-cm",
+                "creationTimestamp": null
+            },
+            "data": {
+                "application.properties": "#Account MongoDB configuration \n# Service DNS nommenclature\n# \u003cservice\u003e.\u003cpod_namespace\u003e.svc.cluster.local\nspring.data.mongodb.host=accountdb\nspring.data.mongodb.port=27017\n"
+            }
+        },
+        {
+            "kind": "ConfigMap",
+            "apiVersion": "v1",
+            "metadata": {
+                "name": "msa-customer-props-volume-cm",
+                "creationTimestamp": null
+            },
+            "data": {
+                "application.properties": "account.svc.url=http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account\npersonne.svc.url=http://personneapi-msa-dev.192.168.99.100.nip.io/Personne/\n\n#Hystrix configuration\nhystrix.metrics.enabled=true\nmanagement.security.enabled=false\nendpoints.health.sensitive=false\n"
+            }
+        }
+    ]
+}

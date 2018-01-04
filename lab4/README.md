@@ -30,7 +30,6 @@ deployments.
 Now we have a deed understanding of our micro services and we will be focusing on various patterns to make them more powerfull;
 In the following lab4, we will focus on *Circuit Breaker pattern*.
 
----
 ## Circuit Breaker Pattern <a name="circuitbreakerpattern"></a>
 ###[Definition ](#definition)
 <a href="https://martinfowler.com/bliki/CircuitBreaker.html">Circuit breaker pattern</a> was populariezd by Michael Nygard 
@@ -38,7 +37,8 @@ Circuit breaker pattern prevents cascade methods/functions  failures across dist
 The basic idea behind the circuit breaker is to protected function call in a circuit breaker object, which monitors for failures. Once the failures reach a certain threshold, the circuit breaker object stop sending requests to the failed component, and open a new circuit that can be implemented by a fallback function. Once the failde component became available again, the circuit breaker close the opened circuit and automatically start sending new request to the target destination.
 
 Regarding SpringBoot Microservices, applications can leverage <a href=https://cloud.spring.io/spring-cloud-netflix/> Spring Cloud Netflix</a> components ( hystrix and turbine)  to set up a Circuit Breaker pattern
-###[Use Case ](#usecase)
+
+### [Use Case ](#usecase)
 In the following lab, we will setup a distributed system as the following Diagram.
 
 ![Use Case](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/use-case.png "Use Case")
@@ -50,10 +50,10 @@ How do we prevent cascade failure?
 
  ![Use Case Pattern](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/account-svc-circuit-breaker.png "Use Case Pattern")
 
-We will implement a local solution ( method getCustomerAccountListDegrade) that will be called whenever the main account getCustomerAccountList method is not available.
-
+We will implement a local solution *( method getCustomerAccountListDegrade)* that will be called whenever the * getCustomerAccountList * method is not available.i
 
 lab4 will be implemented in a new openshift project  **circuit-breaker** 
+Connect to your openshift cluster and create it.
 
 ```
  oc new-project circuit-breaker
@@ -572,7 +572,16 @@ The circuit is open progressively as request are handled by pods.
 ![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/hystrix-circuit-open.png "PartiallyOpen")
 
 
-##  Next Steps <a name="next"></a>
+## Additional notes and  next Steps <a name="next"></a>
+You can create the lab4 objects from template lab4-template-v1.0.json
+```
+ oc process https://raw.githubusercontent.com/nelvadas/microservices-with-openshift/master/lab4/lab4-template-v1.0.json  | oc create -f -
+```
+Template was created using the following command
+```
+$ oc export  bc/accountapi bc/customerapi dc/accountapi dc/accountdb dc/customerapi dc/turbine-server dc/hystrix-dashboard svc/accountapi svc/accountdb svc/customerapi svc/hystrix-dashboard  svc/turbine-server route/accountapi  route/customerapi route/hystrix-dashboard  route/turbine-server cm/account-props-volume-cm cm/msa-customer-props-volume-cm  --as-template=lab4-template -o json  > lab4-template-v1.0.json
+```
 
+This concludes the Lab N°4.Next labs.
 * [Lab 5](../lab5/): Streaming with Apache Kafka
 
