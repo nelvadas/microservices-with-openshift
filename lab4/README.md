@@ -39,6 +39,19 @@ The basic idea behind the circuit breaker is to protected function call in a cir
 
 Regarding SpringBoot Microservices, applications can leverage <a href=https://cloud.spring.io/spring-cloud-netflix/> Spring Cloud Netflix</a> components ( hystrix and turbine)  to set up a Circuit Breaker pattern
 ###[Use Case ](#usecase)
+In the following lab, we will setup a distributed system as the following Diagram.
+
+![Use Case](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/use-case.png "Use Case")
+
+The Customer Microservice aggregates data from Personne and Account Microservices.
+It retreives the customer identity from Personne SVC, then retreive the customer's account list from Account Microservice and aggregate the result flow.
+The customer micro service and our system in general depends on the status of Personne/Account services. What happens if the Account services is not available?
+How do we prevent cascade failure?
+
+ ![Use Case Pattern](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/account-svc-circuit-breaker.png "Use Case Pattern")
+
+We will implement a local solution ( method getCustomerAccountListDegrade) that will be called whenever the main account getCustomerAccountList method is not available.
+
 
 lab4 will be implemented in a new openshift project  **circuit-breaker** 
 
@@ -52,12 +65,19 @@ When it comes to Circuit breaker implementations, the following frameworks and t
 * Hystrix and Turbine
 * Istio
 
+In the following section, we are using Hystrix and Turbine to put all the components in  the puzzle.
+
+![Architecture](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/hystrix-turbine-workflow.png "Architecture")
+
+
 #### Hystrix  <a name="histrix"></a>
  <a href=https://github.com/Netflix/Hystrix>Hystrix</a> is a library that helps application developpers to increase microservices resilience. 
 * Isolate remote calls
 * Stop cascade failures in distributed systems calls
 * Provide call fallback options
 * Add latency and  fault tolerance  logic
+Hystrics dependency in the project introspect calls, and provides some metrics in a stream called hystrix.stream
+Hystrix also provides a dasboard to visualize metrics and what goes 
 
 Follow the following instructions to install the Hystrix dashobard in the circruit-breaker project
 * Install hysterix dashboard
