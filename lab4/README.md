@@ -38,10 +38,10 @@ The basic idea behind the circuit breaker is to protected function call in a cir
 
 Regarding SpringBoot Microservices, applications can leverage <a href=https://cloud.spring.io/spring-cloud-netflix/> Spring Cloud Netflix</a> components ( hystrix and turbine)  to set up a Circuit Breaker pattern
 
-### Use Case <a href="usecase">Use Case</a>)
+### Use Case <a href="usecase"></a>
 In the following lab, we will setup a distributed system as the following Diagram.
 
-![Use Case](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/use-case.png "Use Case")
+![Use Case](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/use-case.png =100x20)
 
 The Customer Microservice aggregates data from Personne and Account Microservices.
 It retreives the customer identity from Personne SVC, then retreive the customer's account list from Account Microservice and aggregate the result flow.
