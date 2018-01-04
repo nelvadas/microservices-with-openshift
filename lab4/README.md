@@ -31,14 +31,14 @@ Now we have a deed understanding of our micro services and we will be focusing o
 In the following lab4, we will focus on *Circuit Breaker pattern*.
 
 ## Circuit Breaker Pattern <a name="circuitbreakerpattern"></a>
-###[Definition ](#definition)
+### Definition <a name="definition"></a>
 <a href="https://martinfowler.com/bliki/CircuitBreaker.html">Circuit breaker pattern</a> was populariezd by Michael Nygard 
 Circuit breaker pattern prevents cascade methods/functions  failures across distributed systems calls.
 The basic idea behind the circuit breaker is to protected function call in a circuit breaker object, which monitors for failures. Once the failures reach a certain threshold, the circuit breaker object stop sending requests to the failed component, and open a new circuit that can be implemented by a fallback function. Once the failde component became available again, the circuit breaker close the opened circuit and automatically start sending new request to the target destination.
 
 Regarding SpringBoot Microservices, applications can leverage <a href=https://cloud.spring.io/spring-cloud-netflix/> Spring Cloud Netflix</a> components ( hystrix and turbine)  to set up a Circuit Breaker pattern
 
-### [Use Case ](#usecase)
+### Use Case <a href="usecase">Use Case</a>)
 In the following lab, we will setup a distributed system as the following Diagram.
 
 ![Use Case](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/use-case.png "Use Case")
@@ -59,7 +59,7 @@ Connect to your openshift cluster and create it.
  oc new-project circuit-breaker
 ```
 
-### [Circuit Breaker implementation: state of the art](#circuitbreakerimpl)
+### [Circuit Breaker implementation: state of the art] (#circuitbreakerimpl)
 
 When it comes to Circuit breaker implementations, the following frameworks and technologies can be considered
 * Hystrix and Turbine
