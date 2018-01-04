@@ -110,7 +110,7 @@ hystrix-dashboard   hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io     
 turbine-server      turbine-server-circuit-breaker.192.168.99.100.nip.io                turbine-server      http
 ```
 
-![Hystrix and turbine pods](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-and-turbine-pods.png " Pods") 
+![Hystrix and turbine pods](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/hystrix-and-turbine-pods.png " Pods") 
 
 
 #### [Istio and Envoy Proxy](#istio)
@@ -126,6 +126,7 @@ To create the Account Micro service in the circuit-breaker namespace, you can us
 ```
 oc process https://raw.githubusercontent.com/nelvadas/microservices-with-openshift/master/lab4/accountapi-template-v1.0.0.json | oc create -f -
 ```
+
 If you are using another namespace, you may need to edit the template first to match your specific parameters.
 However You can also create the msa-account application from scratch step by step using the following instructions.
 The two processes give the same results.
@@ -256,6 +257,79 @@ We will implement remote calls to msa-personne and msa-account using Circuit bre
 becomes unavailable, the msa-customer relies on local function calls to provide a fallback and avoid cascade failures.
 
 ### EnableCircuitBreaker and HystrixCommand<a name="hystrixintegration"></a>
+There a few steps to include enable Circuit breaker in the Customer micro servcies.
+
+1. In the pom file include the spring cloud hystrix dependency
+```
+<dependency>
+  <groupId>org.springframework.cloud</groupId>
+  <artifactId>spring-cloud-starter-hystrix</artifactId>
+</dependency>
+```
+Also make sure the spring-boot-starter-actuator is present in your pom file.
+
+2. Enable circuit breaker in your Controllers
+<pre><code>
+@RestController
+<b>@EnableCircuitBreaker</b>
+@RequestMapping("/Customer")
+
+public class CustomerController {
+	
+	
+	
+	@Autowired
+	private AccountService accountService;
+	
+	@Autowired
+	private PersonneService personneService;
+	...
+</code></pre>
+
+3. Use HystrixCommand and fallback in your service calls
+
+<pre><code>
+@Service
+public class AccountService {
+
+	@Value( "${account.svc.url}" )
+	private String accountSvcBaseUrl;
+	
+    <b>@HystrixCommand(fallbackMethod="getCustomerAccountListDegrade")</b>
+   <b> public List<Account> getCustomerAccountList(String id){</b>
+    	System.out.println("account url="+accountSvcBaseUrl);
+    	RestTemplate restTemplate = new RestTemplate();
+    	URI accountUri = URI.create(String.format("%s/%s", accountSvcBaseUrl,id));
+    	Account[] userAccounts= restTemplate.getForObject(accountUri, Account[].class);
+    	return (List<Account>)Arrays.asList(userAccounts);
+    }
+    
+    
+    
+<b>	public List<Account> getCustomerAccountListDegrade(String id){  </b>
+    	 Account userDefaultAccount = new Account();
+    	 userDefaultAccount.setAccountType("CompteCourant");
+    	 userDefaultAccount.setOwner(id);
+    	 userDefaultAccount.setStatus("*****ServiceDégradé****");
+    	 userDefaultAccount.setBalance(1.00);
+    	 return (List<Account>)Arrays.asList(userDefaultAccount);
+    	 
+    }
+	
+</code></pre>
+	
+4. (Optionnal) Adjust your Hystrix configuration in application.properties
+```
+MacBook-Pro-de-elvadas:dev enonowog$ cat application.properties
+account.svc.url=http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account
+personne.svc.url=http://personneapi-msa-dev.192.168.99.100.nip.io/Personne/
+
+#Hystrix configuration
+hystrix.metrics.enabled=true
+management.security.enabled=false
+endpoints.health.sensitive=false
+```
+
 
 ### Deployment in Openshift<a name="openshiftdeployment"></a>
 * Create the CustomerAPI application
@@ -288,7 +362,7 @@ oc volume --add=true  --mount-path=/deployments/config --configmap-name=msa-cust
 oc expose svc/customerapi
 ```
 
-*The customer microserice exposes an hystrix stream at 
+* The customer microserice exposes an hystrix stream at 
 ```
 $ curl http://customerapi-circuit-breaker.192.168.99.100.nip.io/hystrix.stream
 ...
@@ -407,7 +481,7 @@ In this configuration, the AccountService is responding fine. ( Circuit Closed)
 At the contrary, the PersonneService is using the fallback to return the default Identify
 The diagram show ( Hosts=2) as we have two pods for the customerapi service.
 
-![Circuit Closed](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuitclosed.png " Circuit Closed")
+![Circuit Closed](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/hystrix-circuitclosed.png " Circuit Closed")
 
 
 ### Demo: circuit open <a name="democircuitopen"></a>
@@ -458,11 +532,11 @@ X-Application-Context: application
 The circuit is open progressively as request are handled by pods.
 
 
-![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuit-pod-open.png "PartiallyOpen")
+![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/hystrix-circuit-pod-open.png "PartiallyOpen")
 
  At the end the circuit is opened for all the pods and transition to the following state
 
-![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuit-open.png "PartiallyOpen")
+![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/hystrix-circuit-open.png "PartiallyOpen")
 
 
 ##  Next Steps <a name="next"></a>
