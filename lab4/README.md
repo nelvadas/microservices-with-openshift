@@ -9,10 +9,11 @@
 3. [Account Microservice](#accountmsa)
     1. [Creating the application from template](#accountmsa-template)
     2. [Testing the application](#demodata)
-4. [Personne Microservice with Hystrix dependency](#updatepersonne)
+4. [Customer Microservice with Hystrix dependency](#updatepersonne)
     1. [EnableCircuitBreaker and HystrixCommand ](#hystrixintegration)
-    2. [Demo: Circuit closed](#democircuitclosed)
-    3. [Demo: Circuit open](#democircuitopen)
+    2. [Deployment on Openshift](#openshiftdeployment)
+    3. [Demo: Circuit closed](#democircuitclosed)
+    4. [Demo: Circuit open](#democircuitopen)
 5. [Next Labs](#next)
 
 
@@ -66,6 +67,11 @@ oc expose service hystrix-dashboard --port=8080
 
 #### Turbine  <a name="turbine"></a>
 <a href="https://github.com/Netflix/Turbine/wiki">turbine</a>  is a tool for aggregating streams of Server-Sent Event (SSE) JSON data into a single stream; it can be used as  hystrix stats collector.
+Turbine is important if you want to aggregate a set of hystrix streams in a single hystrix dashboard but also when you hare working in a HA environement where services s
+should be scaled up.
+
+Turbine will collect  streams of available and autorized namesapces services and pass them to the single Hystrix dashboard
+
 
 Follow the following instructions to setup a turbine server in the project
 * Create turbine Kubernetes objects
@@ -101,9 +107,6 @@ turbine-server      turbine-server-circuit-breaker.192.168.99.100.nip.io        
 #### Use Case  <a name="usecase"></a>
 
 
-
-Notes
-http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io/monitor/monitor.html?stream=http%3A%2F%2Fturbine-server-circuit-breaker.192.168.99.100.nip.io%2Fturbine.stream
 
 
 ### Account List Microservice<a name="accountmsa"></a>
@@ -240,10 +243,11 @@ X-Application-Context: application
 ##  Customer  Microservice with Hystrix dependency <a name="updatepersonne"></a>
 #### EnableCircuitBreaker and HystrixCommand<a name="hystrixintegration"></a>
 
-#### Deployment in Openshift
+#### Deployment in Openshift<a name="openshiftdeployment"></a>
 * Create the CustomerAPI application
 ```
-oc new-app redhat-openjdk18-openshift~https://github.com/nelvadas/microservices-with-openshift.git --context-dir=lab4/msa-customer  --name=customerapi
+oc new-app redhat-openjdk18-openshift~https://github.com/nelvadas/microservices-with-openshift.git --context-dir=lab4/msa-customer \
+  --name=customerapi
 ```
 
 
@@ -254,6 +258,7 @@ $ cat application.properties
   account.svc.url=http://accountapi-circuit-breaker.192.168.99.100.nip.io/Account
   personne.svc.url=http://personneapi-msa-dev.192.168.99.100.nip.io/Personne/
 ```
+
 * Create the msa-customer-props-volume-cm
 ```
 $ oc create cm msa-customer-props-volume-cm --from-file=.
@@ -264,10 +269,176 @@ configmap "msa-customer-props-volume-cm" created
 ```
 oc volume --add=true  --mount-path=/deployments/config --configmap-name=msa-customer-props-volume-cm --name=props-vol dc/customerapi
 ```
+* Expose the customerapi service
+```
+oc expose svc/customerapi
+```
+
+* In order for Turbine to be aware of the customerapi hystrix streams, the service should be annotated with the label hystrix.enabled=true
+```
+oc label svc/customerapi hystrix.enabled=true
+```
+We can also add a specific hystrix cluster name; by default all the hystrix streams will be agregated in a single default cluster.
+```
+oc label svc/customerapi hystrix.cluster=default
+```
+once you complete this operation, your turbine server should detect the hystrix endpoints for all the customerapi pods
+
+```
+$ curl http://turbine-server-circuit-breaker.192.168.99.100.nip.io/discovery
+
+<h1>Hystrix Endpoints:</h1>
+<h3>http://172.17.0.5:8080/hystrix.stream default:true</h3>
+<h3>http://172.17.0.9:8080/hystrix.stream default:true</h3>
+
+```
+
+Turbine stream should be available from *http://turbine-server-circuit-breaker.192.168.99.100.nip.io/turbine.stream*
+
+
+```
+$ curl   http://turbine-server-circuit-breaker.192.168.99.100.nip.io/turbine.stream
+: ping
+data: {"currentCorePoolSize":10,"currentLargestPoolSize":10,"propertyValue_metricsRollingStatisticalWindowInMilliseconds":10000,"currentActiveCount":0,"currentMaximumPoolSize":10,"currentQueueSize":0,"type":"HystrixThreadPool","currentTaskCount":200,"currentCompletedTaskCount":200,"rollingMaxActiveThreads":0,"rollingCountCommandRejections":0,"name":"AccountService","reportingHosts":1,"currentPoolSize":10,"propertyValue_queueSizeRejectionThreshold":5,"rollingCountThreadsExecuted":0}
+
+data: {"rollingCountFallbackSuccess":0,"rollingCountFallbackFailure":0,"propertyValue_circuitBreakerRequestVolumeThreshold":20,"propertyValue_circuitBreakerForceOpen":false,"propertyValue_metricsRollingStatisticalWindowInMilliseconds":10000,"latencyTotal_mean":0,"rollingMaxConcurrentExecutionCount":0,"type":"HystrixCommand","rollingCountResponsesFromCache":0,"rollingCountBadRequests":0,"rollingCountTimeout":0,"propertyValue_executionIsolationStrategy":"THREAD","rollingCountFailure":0,"rollingCountExceptionsThrown":0,"rollingCountFallbackMissing":0,"threadPool":"AccountService","latencyExecute_mean":0,"isCircuitBreakerOpen":false,"errorCount":0,"rollingCountSemaphoreRejected":0,"group":"AccountService","latencyTotal":{"0":0,"99":0,"100":0,"25":0,"90":0,"50":0,"95":0,"99.5":0,"75":0},"requestCount":0,"rollingCountCollapsedRequests":0,"rollingCountShortCircuited":0,"propertyValue_circuitBreakerSleepWindowInMilliseconds":5000,"latencyExecute":{"0":0,"99":0,"100":0,"25":0,"90":0,"50":0,"95":0,"99.5":0,"75":0},"rollingCountEmit":0,"currentConcurrentExecutionCount":0,"propertyValue_executionIsolationSemaphoreMaxConcurrentRequests":10,"errorPercentage":0,"rollingCountThreadPoolRejected":0,"propertyValue_circuitBreakerEnabled":true,"propertyValue_executionIsolationThreadInterruptOnTimeout":true,"propertyValue_requestCacheEnabled":true,"rollingCountFallbackRejection":0,"propertyValue_requestLogEnabled":true,"rollingCountFallbackEmit":0,"rollingCountSuccess":0,"propertyValue_fallbackIsolationSemaphoreMaxConcurrentRequests":10,"propertyValue_circuitBreakerErrorThresholdPercentage":50,"propertyValue_circuitBreakerForceClosed":false,"name":"getCustomerAccountList","reportingHosts":1,"propertyValue_executionIsolationThreadPoolKeyOverride":"null","propertyValue_executionIsolationThreadTimeoutInMilliseconds":1000,"propertyValue_executionTimeoutInMilliseconds":1000}
+
+...
+
+```
 
 
 #### Demo: circuit closed <a name="democircuitclosed"></a>
+The circuit is said to be closed when the primary application flow is working as expected
+
+Open the hystrix dashboard by clicking on <a href="http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io">http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io</a>
+
+Enter the turbine stream <a href="http://turbine-server-circuit-breaker.192.168.99.100.nip.io/turbine.stream">http://turbine-server-circuit-breaker.192.168.99.100.nip.io/turbine.stream</a> to monitor the whole services.
+
+
+![Hystrix Dashboard](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-dashboard.png " Dashboard")
+
+
+To monitor a specific hystrix stream, you can use the associated hystrix url : eg  http://customerapi-circuit-breaker.192.168.99.100.nip.io/hystrix.stream for customerapi
+
+
+```
+ $ for i in {1..100}  ;do http  http://customerapi-circuit-breaker.192.168.99.100.nip.io/Customer/1  ; done
+```
+you may also want to use the *ab* command to send a huge load concurrently.
+```
+$ ab -n 100 http://customerapi-circuit-breaker.192.168.99.100.nip.io/Customer/1
+```
+
+As we did not plug a personneapi service, in a normal working behaviour is to have the following details for Customer N°1
+
+```
+
+HTTP/1.1 200
+Cache-control: private
+Content-Type: application/json;charset=UTF-8
+Date: Tue, 02 Jan 2018 17:54:24 GMT
+Set-Cookie: 89d8f9242644e4d50e3d4fc0cb57fb52=b8cddb30aae526ceebb54e89f5177dd9; path=/; HttpOnly
+Transfer-Encoding: chunked
+X-Application-Context: application
+
+{
+    "accounts": [
+        {
+            "accountType": "CompteCourant",
+            "balance": 10.0,
+            "creationDate": null,
+            "id": "5a4b2e29dc0e8200013fb122",
+            "owner": "1",
+            "status": "active"
+        },
+        {
+            "accountType": "LivretA",
+            "balance": 500.0,
+            "creationDate": null,
+            "id": "5a4b2e9adc0e8200013fb123",
+            "owner": "1",
+            "status": "active"
+        },
+        {
+            "accountType": "LDD",
+            "balance": 300.0,
+            "creationDate": null,
+            "id": "5a4b2ea7dc0e8200013fb124",
+            "owner": "1",
+            "status": "active"
+        }
+    ],
+    "identity": {
+        "birthDate": null,
+        "customTag": "*****ServicePersonneDégradé****",
+        "firstName": null,
+        "lastName": null,
+        "ref": "1"
+    }
+}
+```
+In this configuration, the AccountService is responding fine. ( Circuit Closed)
+At the contrary, the PersonneService is using the fallback to return the default Identify
+The diagram show ( Hosts=2) as we have two pods for the customerapi service.
+
+![Circuit Closed](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuitclosed.png " Circuit Closed")
+
+
 #### Demo: circuit open <a name="democircuitopen"></a>
+Whenever the primary path defined for the remote ws become unreachable ( min thresold=20 calls per window frame : 1min) 
+the circuit is opened.
+
+Scale the accountapi down to make fail all the requests to the getCustomerAccountList
+
+```
+$ oc scale dc/accountapi --replicas=0
+```
+
+The account service becomes unavailable, so Hystrix command should fall back on the second route
+to return the default user account as implemented in the AccountService class.
+
+```
+$ ab -n 100 http://customerapi-circuit-breaker.192.168.99.100.nip.io/Customer/1
+
+HTTP/1.1 200
+Cache-control: private
+Content-Type: application/json;charset=UTF-8
+Date: Tue, 02 Jan 2018 18:05:45 GMT
+Set-Cookie: 89d8f9242644e4d50e3d4fc0cb57fb52=c6482b502dea1a3307fec95f1d46821c; path=/; HttpOnly
+Transfer-Encoding: chunked
+X-Application-Context: application
+
+{
+    "accounts": [
+        {
+            "accountType": "CompteCourant",
+            "balance": 1.0,
+            "creationDate": null,
+            "id": null,
+            "owner": "1",
+            "status": "*****ServiceDégradé****"
+        }
+    ],
+    "identity": {
+        "birthDate": null,
+        "customTag": "*****ServicePersonneDégradé****",
+        "firstName": null,
+        "lastName": null,
+        "ref": "1"
+    }
+}
+
+```
+The circuit is open progressively as request are handled by pods.
+
+
+![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuit-pod-open.png "PartiallyOpen")
+
+ At the end the circuit is opened for all the pods and transition to the following state
+
+![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuit-open.png "PartiallyOpen")
+
 
 ###  Next Steps <a name="next"></a>
 
