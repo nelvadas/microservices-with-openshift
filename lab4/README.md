@@ -36,12 +36,12 @@ In the following lab4, we will focus on *Circuit Breaker pattern*.
 Circuit breaker pattern prevents cascade methods/functions  failures across distributed systems calls.
 The basic idea behind the circuit breaker is to protected function call in a circuit breaker object, which monitors for failures. Once the failures reach a certain threshold, the circuit breaker object stop sending requests to the failed component, and open a new circuit that can be implemented by a fallback function. Once the failde component became available again, the circuit breaker close the opened circuit and automatically start sending new request to the target destination.
 
-Regarding SpringBoot Microservices, applications can leverage <a href=https://cloud.spring.io/spring-cloud-netflix/> Spring Cloud Netflix</a> components ( hystrix and turbine)  to set up a Circuit Breaker pattern
+Regarding SpringBoot Microservices, applications can either leverage <a href=https://cloud.spring.io/spring-cloud-netflix/> Spring Cloud Netflix</a> components ( hystrix and turbine) or ISTIO  to set up a Circuit Breaker pattern.
 
 ### Use Case <a href="usecase"></a>
 In the following lab, we will setup a distributed system as the following Diagram.
 
-![Use Case](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/use-case.png =100x20)
+![Use Case](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/use-case.png "Use case")
 
 The Customer Microservice aggregates data from Personne and Account Microservices.
 It retreives the customer identity from Personne SVC, then retreive the customer's account list from Account Microservice and aggregate the result flow.
