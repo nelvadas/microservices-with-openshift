@@ -118,9 +118,9 @@ turbine-server      turbine-server-circuit-breaker.192.168.99.100.nip.io        
 In this lab we will only focus on Hystrix and Turbine for circuit breaking implementation and monitoring. Istio will be handle latter in another lab.
 
 
-### Account List Microservice<a name="accountmsa"></a>
+## Account Microservice<a name="accountmsa"></a>
 
-###  Creating application  <a name="accountmsa-template"></a>
+### Creating the application from template<a name="accountmsa-template"></a>
 To create the Account Micro service in the circuit-breaker namespace, you can use the following command template.
 
 ```
@@ -246,10 +246,15 @@ X-Application-Context: application
 ]
 ```
 
-
+The dependent account microservice is now ready, In the next section we will implement and setup a customer microservice with a dependency on msa-acount.
 
 
 ##  Customer  Microservice with Hystrix dependency <a name="updatepersonne"></a>
+
+The customer Microserice agrgregate details from both msa-personne and msa-account to provide a single customer view.
+We will implement remote calls to msa-personne and msa-account using Circuit breaker pattern so that whenenver the msa-account or msa-personne 
+becomes unavailable, the msa-customer relies on local function calls to provide a fallback and avoid cascade failures.
+
 ### EnableCircuitBreaker and HystrixCommand<a name="hystrixintegration"></a>
 
 ### Deployment in Openshift<a name="openshiftdeployment"></a>
@@ -281,6 +286,17 @@ oc volume --add=true  --mount-path=/deployments/config --configmap-name=msa-cust
 * Expose the customerapi service
 ```
 oc expose svc/customerapi
+```
+
+*The customer microserice exposes an hystrix stream at 
+```
+$ curl http://customerapi-circuit-breaker.192.168.99.100.nip.io/hystrix.stream
+...
+
+```
+* To simulate two hosts, scale the hystrix to 02 replicas
+```
+$ oc scale dc/customerapi --replicas=2
 ```
 
 * In order for Turbine to be aware of the customerapi hystrix streams, the service should be annotated with the label hystrix.enabled=true
