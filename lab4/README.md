@@ -3,12 +3,15 @@
 # Table of contents
 1. [Introduction](#introduction)
 2. [Circuit Breaker Pattern](#circuitbreakerpattern)
-    1. [Hystrix](#histrix)
-    2. [Turbine](#turbine)
-    3. [Personne Accounts calls](#usecase)
+    1. [Definition](#definition)
+    2. [Use Case ](#usecase)
+    3. [Circuit Breaker implementation: state of the art](#circuitbreakerimpl)
+       1. [Hystrix](#histrix)
+       2. [Turbine](#turbine)
+       3. [Istio and Envoy Proxy](#istio)
 3. [Account Microservice](#accountmsa)
-    1. [Creating the application from template](#accountmsa-template)
-    2. [Testing the application](#demodata)
+   1. [Creating the application from template](#accountmsa-template)
+   2. [Testing the application](#demodata)
 4. [Customer Microservice with Hystrix dependency](#updatepersonne)
     1. [EnableCircuitBreaker and HystrixCommand ](#hystrixintegration)
     2. [Deployment on Openshift](#openshiftdeployment)
@@ -17,7 +20,7 @@
 5. [Next Labs](#next)
 
 
-### Introduction <a name="introduction"></a>
+## Introduction <a name="introduction"></a>
 In [Lab 1](../lab1/), you created an ephemeral MongoDB to store Microservices data, You also create various Kubernetes objects 
 to build, deploy,expose your application.
 In [Lab 2](../lab2/), you created a persitent database to store , you also created templates and quickly deploy your microservices
@@ -28,13 +31,14 @@ Now we have a deed understanding of our micro services and we will be focusing o
 In the following lab4, we will focus on *Circuit Breaker pattern*.
 
 ---
-### Circuit Breaker Pattern <a name="circuitbreakerpattern"></a>
+## Circuit Breaker Pattern <a name="circuitbreakerpattern"></a>
+###[Definition ](#definition)
 <a href="https://martinfowler.com/bliki/CircuitBreaker.html">Circuit breaker pattern</a> was populariezd by Michael Nygard 
 Circuit breaker pattern prevents cascade methods/functions  failures across distributed systems calls.
 The basic idea behind the circuit breaker is to protected function call in a circuit breaker object, which monitors for failures. Once the failures reach a certain threshold, the circuit breaker object stop sending requests to the failed component, and open a new circuit that can be implemented by a fallback function. Once the failde component became available again, the circuit breaker close the opened circuit and automatically start sending new request to the target destination.
 
 Regarding SpringBoot Microservices, applications can leverage <a href=https://cloud.spring.io/spring-cloud-netflix/> Spring Cloud Netflix</a> components ( hystrix and turbine)  to set up a Circuit Breaker pattern
-
+###[Use Case ](#usecase)
 
 lab4 will be implemented in a new openshift project  **circuit-breaker** 
 
@@ -42,6 +46,11 @@ lab4 will be implemented in a new openshift project  **circuit-breaker**
  oc new-project circuit-breaker
 ```
 
+### [Circuit Breaker implementation: state of the art](#circuitbreakerimpl)
+
+When it comes to Circuit breaker implementations, the following frameworks and technologies can be considered
+* Hystrix and Turbine
+* Istio
 
 #### Hystrix  <a name="histrix"></a>
  <a href=https://github.com/Netflix/Hystrix>Hystrix</a> is a library that helps application developpers to increase microservices resilience. 
@@ -104,14 +113,14 @@ turbine-server      turbine-server-circuit-breaker.192.168.99.100.nip.io        
 ![Hystrix and turbine pods](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-and-turbine-pods.png " Pods") 
 
 
-#### Use Case  <a name="usecase"></a>
+#### [Istio and Envoy Proxy](#istio)
 
-
+In this lab we will only focus on Hystrix and Turbine for circuit breaking implementation and monitoring. Istio will be handle latter in another lab.
 
 
 ### Account List Microservice<a name="accountmsa"></a>
 
-#### Creating application  <a name="accountmsa-template"></a>
+###  Creating application  <a name="accountmsa-template"></a>
 To create the Account Micro service in the circuit-breaker namespace, you can use the following command template.
 
 ```
@@ -172,7 +181,7 @@ oc set probe dc/accountapi  --readiness  --initial-delay-seconds=5  --get-url=ht
 oc set probe dc/accountapi  --liveness  --initial-delay-seconds=0  --get-url=http://:8080/health
 ```
 
-#### Testing the Application <a name="demodata"></a>
+### Testing the Application <a name="demodata"></a>
 
 In this section, we are going to create a set of accounts for the user Number 1.
 ```
@@ -241,9 +250,9 @@ X-Application-Context: application
 
 
 ##  Customer  Microservice with Hystrix dependency <a name="updatepersonne"></a>
-#### EnableCircuitBreaker and HystrixCommand<a name="hystrixintegration"></a>
+### EnableCircuitBreaker and HystrixCommand<a name="hystrixintegration"></a>
 
-#### Deployment in Openshift<a name="openshiftdeployment"></a>
+### Deployment in Openshift<a name="openshiftdeployment"></a>
 * Create the CustomerAPI application
 ```
 oc new-app redhat-openjdk18-openshift~https://github.com/nelvadas/microservices-with-openshift.git --context-dir=lab4/msa-customer \
@@ -308,7 +317,7 @@ data: {"rollingCountFallbackSuccess":0,"rollingCountFallbackFailure":0,"property
 ```
 
 
-#### Demo: circuit closed <a name="democircuitclosed"></a>
+### Demo: circuit closed <a name="democircuitclosed"></a>
 The circuit is said to be closed when the primary application flow is working as expected
 
 Open the hystrix dashboard by clicking on <a href="http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io">http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io</a>
@@ -385,7 +394,7 @@ The diagram show ( Hosts=2) as we have two pods for the customerapi service.
 ![Circuit Closed](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuitclosed.png " Circuit Closed")
 
 
-#### Demo: circuit open <a name="democircuitopen"></a>
+### Demo: circuit open <a name="democircuitopen"></a>
 Whenever the primary path defined for the remote ws become unreachable ( min thresold=20 calls per window frame : 1min) 
 the circuit is opened.
 
@@ -440,7 +449,7 @@ The circuit is open progressively as request are handled by pods.
 ![PartiallyOpen](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-circuit-open.png "PartiallyOpen")
 
 
-###  Next Steps <a name="next"></a>
+##  Next Steps <a name="next"></a>
 
 * [Lab 5](../lab5/): Streaming with Apache Kafka
 
