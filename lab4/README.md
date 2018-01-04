@@ -408,7 +408,20 @@ data: {"rollingCountFallbackSuccess":0,"rollingCountFallbackFailure":0,"property
 
 
 ### Demo: circuit closed <a name="democircuitclosed"></a>
-The circuit is said to be closed when the primary application flow is working as expected
+The circuit is said to be closed when the hystrix command call is  using the primary service call , not the fallback.
+
+Check all your services  are up and running.
+```
+$ oc get pods
+NAME                        READY     STATUS    RESTARTS   AGE
+accountapi-5-sfmvg          1/1       Running   2          1d
+accountdb-1-ds8tf           1/1       Running   1          2d
+customerapi-3-bn9k9         1/1       Running   0          4m
+customerapi-3-zmfps         1/1       Running   0          3m
+hystrix-dashboard-1-6gcdd   1/1       Running   1          2d
+turbine-server-15-kwh2p     1/1       Running   1          1d
+```
+
 
 Open the hystrix dashboard by clicking on <a href="http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io">http://hystrix-dashboard-circuit-breaker.192.168.99.100.nip.io</a>
 
