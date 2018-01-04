@@ -341,7 +341,7 @@ Open the hystrix dashboard by clicking on <a href="http://hystrix-dashboard-circ
 Enter the turbine stream <a href="http://turbine-server-circuit-breaker.192.168.99.100.nip.io/turbine.stream">http://turbine-server-circuit-breaker.192.168.99.100.nip.io/turbine.stream</a> to monitor the whole services.
 
 
-![Hystrix Dashboard](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/hystrix-dashboard.png " Dashboard")
+![Hystrix Dashboard](https://github.com/nelvadas/microservices-with-openshift/blob/master/lab4/images/hystrix-dashboard.png " Dashboard")
 
 
 To monitor a specific hystrix stream, you can use the associated hystrix url : eg  http://customerapi-circuit-breaker.192.168.99.100.nip.io/hystrix.stream for customerapi
